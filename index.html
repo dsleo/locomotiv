@@ -176,6 +176,9 @@ h1,h2,h3{margin:0;text-wrap:balance;font-weight:400}
 .opt.bad{opacity:.5;text-decoration:line-through}
 .zoomimg{aspect-ratio:4/3;border:10px solid var(--t-panel);border-radius:var(--t-r);background-repeat:no-repeat;background-color:#ccc;box-shadow:var(--t-sh);transition:background-size .6s,background-position .6s}
 [data-sw]:focus-visible circle{stroke:#000;stroke-width:5}
+#dbg{position:fixed;left:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:20}
+.dbg{display:flex;align-items:center;gap:10px;background:#111;color:#fff;padding:8px 8px 8px 14px;border-radius:999px;font:700 13px/1 var(--body);box-shadow:0 4px 14px rgba(0,0,0,.35)}
+.dbg button{border:0;border-radius:999px;background:#fff;color:#111;padding:8px 14px;font:700 13px var(--body);min-height:36px}
 @media (max-width:760px){.memo{grid-template-columns:repeat(3,minmax(0,1fr))}.hero,.tp,.setup,.era{grid-template-columns:minmax(0,1fr)}.collage{height:400px}.mini{width:calc(50% - 7px)}}
 @media (prefers-reduced-motion:reduce){.tile.bad{animation:none}}
 </style>
@@ -184,6 +187,7 @@ h1,h2,h3{margin:0;text-wrap:balance;font-weight:400}
 <div class="wrap">
   <header class="bar"><button class="brand" data-go="home">Carnet de gares</button><nav class="nav" id="nav" aria-label="Explorer"></nav></header>
   <main id="app"></main>
+  <div id="dbg"></div>
 </div>
 <script>
 const LAND="M487,219 L480,223 L482,227 L480,231 L472,241 L468,247 L462,253 L459,261 L449,271 L448,280 L447,289 L443,294 L453,291 L455,283 L462,281 L475,281 L476,289 L478,297 L482,302 L482,309 L475,313 L480,322 L482,329 L489,335 L487,342 L480,348 L473,349 L469,354 L473,359 L480,365 L484,373 L480,377 L477,384 L478,390 L482,398 L488,402 L496,407 L504,405 L510,409 L505,416 L502,425 L496,429 L490,433 L485,438 L480,442 L476,446 L470,450 L470,453 L467,458 L458,464 L450,464 L445,464 L439,465 L434,461 L428,459 L419,456 L416,450 L405,446 L400,450 L389,447 L382,444 L370,438 L357,446 L346,453 L333,465 L331,484 L334,495 L334,500 L327,498 L320,501 L312,505 L305,502 L296,501 L290,501 L285,498 L283,492 L276,489 L271,490 L267,485 L259,485 L250,480 L240,478 L237,486 L229,484 L223,484 L216,485 L206,479 L199,479 L193,481 L187,475 L181,471 L170,467 L165,464 L159,464 L162,455 L155,455 L148,450 L156,441 L162,418 L168,381 L174,377 L170,371 L168,366 L171,332 L177,330 L186,344 L190,352 L186,335 L176,324 L167,314 L173,309 L174,300 L169,294 L172,288 L166,285 L158,280 L146,275 L136,259 L139,245 L130,240 L132,232 L123,231 L118,226 L119,220 L115,217 L106,219 L107,216 L110,212 L102,215 L97,220 L93,212 L94,206 L87,208 L80,203 L80,202 L71,203 L63,198 L55,199 L48,203 L45,192 L35,190 L42,186 L51,184 L48,180 L41,178 L41,173 L46,175 L54,175 L45,172 L41,171 L33,171 L32,163 L39,159 L46,155 L55,153 L63,151 L68,155 L74,153 L79,151 L82,146 L91,144 L98,146 L102,151 L107,158 L112,162 L121,155 L126,157 L132,158 L137,158 L138,158 L143,153 L151,157 L158,153 L154,145 L155,136 L153,123 L146,115 L144,105 L141,97 L147,98 L158,99 L166,98 L165,106 L172,116 L187,117 L201,118 L219,114 L225,111 L218,108 L224,96 L237,89 L250,86 L268,77 L279,71 L274,65 L274,58 L275,45 L278,32 L287,26 L299,23 L313,21 L315,33 L324,40 L332,37 L339,42 L340,51 L349,53 L355,60 L363,62 L372,65 L373,73 L373,79 L379,82 L390,81 L399,71 L399,78 L400,84 L404,91 L412,97 L418,102 L424,108 L433,106 L440,108 L449,110 L460,110 L466,117 L471,124 L477,126 L481,124 L488,129 L496,128 L502,130 L510,133 L519,133 L529,138 L521,149 L513,158 L510,171 L505,183 L506,193 L503,206 L502,217 L499,220 L490,223Z M574,532 L574,537 L573,544 L570,547 L573,547 L570,549 L569,552 L570,553 L567,557 L565,559 L562,558 L560,554 L555,552 L553,549 L550,547 L551,545 L555,542 L551,540 L548,540 L548,535 L551,532 L549,529 L545,529 L544,526 L547,523 L549,521 L546,518 L542,516 L543,513 L544,510 L547,509 L544,505 L542,505 L544,501 L546,498 L548,493 L551,493 L554,489 L559,489 L562,485 L566,484 L570,487 L572,482 L571,474 L572,468 L576,470 L577,476 L576,487 L579,495 L580,513 L576,524 L574,532Z";
@@ -260,7 +264,14 @@ const line=t=>[t.t.acc,t.t.ink,'#C8282D'].find(c=>lum(c)<.3)||'#C8282D';
 let save={seen:[],trips:0};
 try{const s=JSON.parse(localStorage.getItem('carnet-v1')||'null');if(s&&Array.isArray(s.seen))save=s}catch(e){}
 const persist=()=>{try{localStorage.setItem('carnet-v1',JSON.stringify(save))}catch(e){}};
-const unlockedN=()=>Math.min(TRAINS.length,1+save.trips);
+/* Mode test : ajoute ?debug à l'adresse (ou #debug) pour tout débloquer et voir tous les jeux. ?debug=0 pour le quitter. */
+let debug=false;
+try{
+  if(/[?&]debug=0\b/.test(location.search))localStorage.removeItem('carnet-debug');
+  else if(/[?&]debug\b/.test(location.search)||location.hash==='#debug')localStorage.setItem('carnet-debug','1');
+  debug=localStorage.getItem('carnet-debug')==='1';
+}catch(e){debug=/[?&]debug\b/.test(location.search)||location.hash==='#debug'}
+const unlockedN=()=>debug?TRAINS.length:Math.min(TRAINS.length,1+save.trips);
 const unlocked=t=>TRAINS.indexOf(t)<unlockedN();
 const S={v:'home',id:'picasso',cities:['Paris','Lyon','Bordeaux'],pick:'picasso',play:null,sg:null,confirm:false,gt:'picasso',gk:null,g:null};
 
@@ -305,7 +316,7 @@ function trainPage(){
   if(!lock&&!save.seen.includes(t.id)){save.seen.push(t.id);persist()}
   return `<article class="th" style="${th(t.t)}"><div class="era-tag">${era[1]} · ${t.yrs}</div><div class="tp"><div><div class="phw"><figure class="frame"><img src="${photo(t)}" alt="${t.name}" style="object-position:${t.pos};${lock?'filter:grayscale(1) blur(6px)':''}"></figure>${credBtn(t)}</div>${t.video&&!lock?`<div class="phw vid"><video controls playsinline preload="metadata" poster="${photo(t)}" src="videos/${t.video.f}.mp4" aria-label="Vidéo : ${t.name}"></video>${credBtn(t.video,'Vidéo')}</div>`:''}</div>
   <div><h1>${t.name}</h1><div class="sub">${t.sub}</div>${lock?`<div class="stats"><div class="stat" style="grid-column:1/-1"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><b>Verrouillé</b><span>Réussis « Tape et roule » avec le train d'avant pour débloquer celui-ci.</span></div></div>`:`<div class="stats">${t.stats.map(s=>`<div class="stat">${ico(s[0],s[1])}<b>${s[0]}</b><span>${s[1]}</span></div>`).join('')}</div><p class="blurb">${t.blurb}</p>`}
-  <div class="games" style="margin-top:22px"><button class="game" data-pick="${t.id}" ${lock?'disabled':''}><svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${IC.kbd}</svg><b>Tape et roule</b></button>${otherCard(t,lock)}</div></div></div></div>
+  <div class="games" style="margin-top:22px"><button class="game" data-pick="${t.id}" ${lock?'disabled':''}><svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${IC.kbd}</svg><b>Tape et roule</b></button>${debug?OTHER.filter(k=>k!=='speed'||t.speed).map(k=>otherCard(t,lock,k)).join(''):otherCard(t,lock)}</div></div></div></div>
   </article>`;
 }
 function journey(){
@@ -368,6 +379,7 @@ function nextSpeed(){
 }
 function render(keep){
   nav();
+  $('#dbg').innerHTML=debug?'<div class="dbg">MODE TEST : tout est débloqué <button data-act="debug-off">Quitter</button></div>':'';
   $('#app').innerHTML=S.v==='home'?home():S.v==='eras'?eras():S.v==='train'?trainPage():S.v==='journey'?journey():S.v==='album'?album():S.v==='memo'?memo():S.v==='heure'?heure():S.v==='rail'?rail():S.v==='bon'?bon():speed();
   if(S.v==='journey'&&S.play)initPlay();
   if(S.v==='speed'&&S.sg&&S.sg.phase==='ask'&&$('#sg-in')){
@@ -432,8 +444,8 @@ function finish(city){
 const GAMES={tape:{n:'Tape et roule',ic:'kbd'},memo:{n:'Mémo des trains',ic:'memo'},heure:{n:'Quelle heure ?',ic:'clock'},rail:{n:'Aiguillage',ic:'fork'},bon:{n:'Le bon train',ic:'search'},speed:{n:'Plus ou moins',ic:'gauge'}};
 const OTHER=['memo','heure','rail','bon','speed'];
 function otherGame(t){const i=TRAINS.indexOf(t),o=i+Math.floor(i/5);for(let k=0;k<5;k++){const g=OTHER[(o+k)%5];if(g!=='speed'||t.speed)return g}}
-function otherCard(t,lock){
-  const k=otherGame(t),g=GAMES[k];
+function otherCard(t,lock,k=otherGame(t)){
+  const g=GAMES[k];
   const attr=k==='speed'?`data-act="speedone" data-id="${t.id}"`:`data-play="${k}" data-id="${t.id}"`;
   return `<button class="game alt" ${attr} ${lock?'disabled':''}><svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${IC[g.ic]}</svg><b>${g.n}</b></button>`;
 }
@@ -583,6 +595,7 @@ document.addEventListener('click',e=>{
   
   else if(d.act==='cred'){const p=b.nextElementSibling;p.hidden=!p.hidden;b.setAttribute('aria-expanded',String(!p.hidden))}
   else if(d.act==='again'){S.cities=[];render()}
+  else if(d.act==='debug-off'){debug=false;try{localStorage.removeItem('carnet-debug')}catch(e){}if(/debug/.test(location.search+location.hash))history.replaceState(null,'',location.pathname);render()}
   else if(d.act==='hnext')heureNext();
   else if(d.act==='rail-go')railGo();
   else if(d.act==='rail-retry'){S.g.phase='set';render(true)}
