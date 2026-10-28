@@ -1,0 +1,609 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Carnet de gares : un jeu pour découvrir les trains de France, de 1950 à aujourd'hui.">
+<style>html{color-scheme:light}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Carnet de gares</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Archivo:wght@800&family=Barlow+Condensed:wght@700&family=Cinzel:wght@700&family=DM+Sans:wght@700&family=Figtree:wght@800&family=IBM+Plex+Sans:wght@700&family=Inter+Tight:wght@800&family=Kaushan+Script&family=Lato:wght@400;700&family=Manrope:wght@800&family=Montserrat:wght@800&family=Nunito:wght@800&family=Oswald:wght@600&family=Outfit:wght@700&family=Public+Sans:wght@800&family=Rubik:wght@700&display=swap">
+<style>
+/* Layout: a paper album shell (accueil, époques, réglages du voyage) around pages that re-skin to each train's own era look. Single look by choice: every colour is set explicitly. */
+:root{--paper:#EFE9DA;--card:#FBF6E6;--ink:#2A2420;--muted:#5A4E40;--red:#C8282D;--line:#D8CFB8;--display:'Abril Fatface',Georgia,serif;--body:'Lato',system-ui,sans-serif}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 40px}
+a{color:inherit}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--red);outline-offset:3px}
+.wrap{max-width:1120px;margin:0 auto}
+.bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 20px;padding-block:14px;border-bottom:3px double var(--ink)}
+.brand{font-family:var(--display);font-size:26px;color:var(--red);text-decoration:none;background:none;border:0;padding:0}
+.nav{display:flex;flex-wrap:wrap;gap:4px}
+.nav button{background:none;border:0;padding:10px 14px;min-height:44px;font-weight:700;letter-spacing:.08em;font-size:13px;text-transform:uppercase;border-radius:999px}
+.nav button[aria-current="page"]{background:var(--ink);color:var(--paper)}
+h1,h2,h3{margin:0;text-wrap:balance;font-weight:400}
+.eyebrow{font-size:13px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+.hero{display:grid;grid-template-columns:minmax(0,1fr);align-items:center;justify-items:center;padding-block:36px 24px}
+.hero>*{grid-area:1/1}
+.cta{position:relative;z-index:1;display:flex;justify-content:center}
+.hero h1{font-family:var(--display);font-size:clamp(48px,9vw,96px);line-height:.95;color:var(--red);margin-bottom:28px}
+.hero p{max-width:46ch;font-size:19px}
+.collage{position:relative;width:100%;height:clamp(500px,74vh,760px)}
+.collage figure{position:absolute;margin:0;padding:8px 8px 40px;background:var(--card);box-shadow:4px 6px 0 -1px rgba(42,36,32,.3)}
+.collage figure::after{content:"";position:absolute;top:16px;right:16px;width:30px;height:38px;border:3px double var(--red);background:rgba(251,246,230,.6)}
+.collage img{display:block;width:100%;height:100%;object-fit:cover;background:#ccc}
+.portals{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;padding-block:20px}
+.portal{display:flex;flex-direction:column;gap:12px;text-align:left;border:0;padding:22px;min-height:230px;background:var(--card);box-shadow:5px 6px 0 -1px rgba(42,36,32,.22)}
+.portal h2{font-family:var(--display);font-size:32px;line-height:1}
+.portal p{margin:0;color:var(--muted)}
+.chips{display:flex;gap:6px;margin-top:auto}
+.chips i{flex:1;height:30px}
+.thumbs{display:flex;gap:6px;margin-top:auto}
+.thumbs img{width:25%;aspect-ratio:1;object-fit:cover;display:block}
+.bigspeed{margin-top:auto;font-family:var(--display);font-size:54px;line-height:1;color:var(--red)}
+.progress{display:flex;flex-wrap:wrap;gap:12px 32px;align-items:center;padding:16px 20px;background:var(--card);border-radius:14px;margin-top:8px}
+.progress b{font-family:var(--display);font-size:28px;font-weight:400}
+.small{font-size:13px;color:var(--muted)}
+.link{background:none;border:0;padding:8px 0;text-decoration:underline;color:var(--muted);font-size:13px}
+.era{display:grid;grid-template-columns:200px minmax(0,1fr);gap:20px;padding-block:22px;border-bottom:1px solid var(--line)}
+.era h2{font-family:var(--display);font-size:30px;line-height:1}
+.era .yrs{font-weight:700;letter-spacing:.12em;font-size:13px;color:var(--red)}
+.row{display:flex;flex-wrap:wrap;gap:14px}
+.mini{width:176px;border:0;padding:0;text-align:left;overflow:hidden;background:var(--t-bg);color:var(--t-ink);font-family:var(--t-font);border-radius:var(--t-r);box-shadow:var(--t-sh)}
+.mini img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover}
+.mini span{display:block;padding:10px 12px 12px;font-size:18px;line-height:1.1}
+.mini small{display:block;font-family:var(--body);font-weight:700;font-size:12px;letter-spacing:.06em;margin-top:4px}
+.mini.lock img{filter:grayscale(1) contrast(.8);opacity:.5}
+/* Pages themed per train */
+.th{background:var(--t-bg);color:var(--t-ink);font-family:var(--t-font);border-radius:0 0 var(--t-r) var(--t-r);padding:28px clamp(16px,3vw,40px) 36px}
+.th .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:52px;padding:0 26px;border:0;border-radius:var(--t-btn);background:var(--t-acc);color:var(--t-on);font-family:var(--t-font);font-size:20px;text-decoration:none;box-shadow:var(--t-sh)}
+.th .btn.alt{background:var(--t-panel);color:var(--t-pi)}
+.th .btn[disabled]{opacity:.5;cursor:not-allowed}
+.tp{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:36px;align-items:start}
+.frame{margin:0;border:10px solid var(--t-panel);border-radius:var(--t-r);overflow:hidden;box-shadow:var(--t-sh);background:#ccc;line-height:0}
+.frame img{width:100%;aspect-ratio:4/3;object-fit:cover}
+.cred{font-size:13px;margin-top:12px;font-family:var(--body);line-height:1.4}
+.th h1{font-size:clamp(44px,7vw,84px);line-height:.95}
+.sub{font-size:20px;margin:12px 0 4px;font-family:var(--body);font-weight:700}
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:20px 0}
+.stat{display:grid;grid-template-columns:48px minmax(0,1fr);column-gap:12px;align-items:center;background:var(--t-panel);color:var(--t-pi);padding:12px 14px;border-radius:var(--t-r);box-shadow:var(--t-sh)}
+.stat .ic{grid-row:1/3;width:48px;height:48px;padding:11px;border-radius:50%;background:var(--t-acc);stroke:var(--t-on);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.stat b{display:block;font-size:28px;line-height:1.05;font-weight:400;overflow-wrap:anywhere}
+.stat span{font-family:var(--body);font-size:14px;font-weight:700;line-height:1.25}
+.blurb{font-family:var(--body);font-size:18px;max-width:52ch}
+.acts{display:flex;flex-wrap:wrap;gap:12px;margin-top:20px}
+.era-tag{font-family:var(--body);font-size:13px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;margin-bottom:12px}
+.pn{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-top:28px}
+/* Voyage */
+.setup{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px;align-items:start}
+.mapcard{background:var(--t-panel);border-radius:var(--t-r);padding:12px;box-shadow:var(--t-sh)}
+.mapcard svg{display:block;width:100%;height:auto;max-height:70vh}
+.pills{display:flex;flex-wrap:wrap;gap:8px}
+.pill{min-height:44px;padding:0 16px;border:2px solid var(--t-ink);background:transparent;color:var(--t-ink);border-radius:var(--t-btn);font-family:var(--t-font);font-size:17px}
+.pill[aria-pressed="true"]{background:var(--t-acc);color:var(--t-on);border-color:var(--t-acc)}
+.picker{display:flex;gap:10px;overflow-x:auto;padding:6px 2px 10px}
+.pick{flex:0 0 92px;border:3px solid transparent;background:var(--t-panel);color:var(--t-pi);border-radius:var(--t-r);padding:0;overflow:hidden;text-align:center;font-family:var(--body);font-size:12px;font-weight:700}
+.pick img{display:block;width:100%;aspect-ratio:1;object-fit:cover}
+.pick[aria-pressed="true"]{border-color:var(--t-acc);outline:3px solid var(--t-ink)}
+.pick span{display:block;padding:4px 2px 6px;line-height:1.1}
+.pick.lock img{filter:grayscale(1);opacity:.45}
+.tiles{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:16px 0}
+.tile{width:clamp(48px,10vw,76px);aspect-ratio:3/4;display:flex;align-items:center;justify-content:center;border:0;border-radius:var(--t-btn);background:var(--t-panel);color:var(--t-pi);font-family:var(--t-font);font-size:clamp(28px,6vw,46px);box-shadow:var(--t-sh)}
+.tile.done{background:var(--t-acc);color:var(--t-on)}
+.tile.next{outline:4px solid var(--t-ink);outline-offset:3px}
+.tile.bad{animation:shake .3s}
+@keyframes shake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+#typer,#sg-in{width:100%;min-height:56px;font:inherit;font-size:22px;text-align:center;border:3px solid var(--t-ink);background:var(--t-panel);color:var(--t-pi);border-radius:var(--t-btn);padding:0 16px;font-family:var(--t-font)}
+#typer{text-transform:uppercase}
+.banner{min-height:28px;text-align:center;font-family:var(--body);font-weight:700;font-size:18px}
+.end{background:var(--t-panel);color:var(--t-pi);border-radius:var(--t-r);padding:22px;margin-top:18px;box-shadow:var(--t-sh);text-align:center}
+.end h2{font-size:40px;line-height:1}
+.end img{width:min(100%,360px);display:block;margin:14px auto;border-radius:var(--t-r)}
+/* Devine la vitesse */
+.big{font-size:clamp(64px,12vw,110px);line-height:1;text-align:center}
+.big small{font-size:.3em;font-family:var(--body);font-weight:700}
+.rng{width:100%;accent-color:var(--t-acc);height:36px}
+.stepper{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:8px 0 14px}
+.stepper .btn{min-height:48px;padding:0 18px;font-size:18px}
+.hint{font-family:var(--t-font);font-size:clamp(34px,6vw,54px);line-height:1;text-align:center;min-height:56px;margin:8px 0}
+.hist{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:8px;font-family:var(--body);font-weight:700}
+.hist li{background:var(--t-panel);color:var(--t-pi);padding:6px 12px;border-radius:var(--t-btn)}
+.hero .lead{font-size:clamp(22px,3.4vw,30px);font-weight:700;line-height:1.25;max-width:20ch;margin:0 0 24px}
+.go{display:inline-flex;align-items:center;gap:10px;min-height:72px;padding:0 44px;border:6px solid var(--card);border-radius:999px;background:var(--red);color:#fff;font-family:var(--display);font-size:36px;box-shadow:0 6px 0 #8f1c20}
+.go:active{transform:translateY(4px);box-shadow:0 2px 0 #8f1c20}
+.collage figcaption{position:absolute;left:0;right:0;bottom:0;height:40px;display:flex;align-items:center;padding:0 12px;font-family:'Kaushan Script',cursive;font-size:20px;color:var(--ink)}
+.album{background:var(--card);border-radius:24px;padding:20px 24px;display:flex;flex-direction:column;gap:16px;box-shadow:5px 6px 0 -1px rgba(42,36,32,.22);margin-top:8px}
+.albumhead{display:flex;flex-wrap:wrap;align-items:center;gap:16px 44px}
+.count{font-family:var(--display);font-size:56px;line-height:1;color:var(--red)}
+.count b{font-weight:400}
+.stars{display:flex;gap:6px}
+.star{font-size:44px;line-height:1;color:var(--line)}
+.star.on{color:#E3A800}
+.lp{width:96px;height:64px;object-fit:cover;border-radius:12px;filter:grayscale(1);opacity:.4;margin-left:auto}
+.lp.on{filter:none;opacity:1}
+.stks{display:grid;grid-template-columns:repeat(auto-fill,minmax(56px,1fr));gap:10px}
+.stk{border:0;padding:0;border-radius:50%;aspect-ratio:1;overflow:hidden;background:var(--line);filter:grayscale(1);opacity:.35}
+.stk img{display:block;width:100%;height:100%;object-fit:cover}
+.stk.on{filter:none;opacity:1;box-shadow:0 0 0 3px var(--card),0 0 0 5px var(--red)}
+.games{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-top:8px}
+.game{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;border:0;padding:20px 16px;background:var(--t-acc);color:var(--t-on);border-radius:var(--t-r);box-shadow:var(--t-sh);font-family:var(--t-font)}
+.game .ic{width:64px;height:64px;padding:14px;border-radius:50%;background:var(--t-on);stroke:var(--t-acc);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.game b{font-size:26px;line-height:1;font-weight:400}
+.game span{font-family:var(--body);font-size:14px;font-weight:700;line-height:1.25}
+.game.alt{background:var(--t-panel);color:var(--t-pi)}
+.game.alt .ic{background:var(--t-acc);stroke:var(--t-on)}
+.game[disabled]{opacity:.5;cursor:not-allowed}
+.phw{position:relative}
+.info{position:absolute;right:16px;bottom:16px;width:20px;height:20px;padding:0;border:0;border-radius:50%;background:var(--t-panel);color:var(--t-pi);font:italic 700 12px/20px Georgia,serif;opacity:.85}
+.info::after{content:"";position:absolute;inset:-12px}
+.credpop{position:absolute;left:16px;right:44px;bottom:16px;background:var(--t-panel);color:var(--t-pi);padding:3px 8px;font:11px/1.3 var(--body);border-radius:6px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.stks2{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px}
+.stk2{border:0;padding:0;background:var(--paper);border-radius:14px;overflow:hidden;text-align:center;font-family:var(--display);font-size:17px;line-height:1.1;color:var(--ink);opacity:.55}
+.stk2 img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;filter:grayscale(1)}
+.stk2 span{display:block;padding:8px 6px 10px}
+.stk2.on{opacity:1;box-shadow:0 0 0 3px var(--red)}
+.stk2.on img{filter:none}
+.track{position:relative;height:170px;overflow:hidden;margin-top:8px}
+.rails{position:absolute;left:0;right:0;bottom:14px;height:14px;background:repeating-linear-gradient(90deg,#8b7b63 0 8px,transparent 8px 28px) bottom/100% 8px no-repeat}
+.rails::before{content:"";position:absolute;left:0;right:0;top:0;height:5px;background:var(--ink)}
+.rider{position:absolute;bottom:22px;left:-660px;width:min(640px,86vw);animation:ride 14s linear infinite,bob .35s ease-in-out infinite alternate}
+.rider svg{display:block;width:100%;height:auto}
+@keyframes ride{from{left:-660px}to{left:100%}}
+@keyframes bob{from{margin-bottom:0}to{margin-bottom:1px}}
+@media (prefers-reduced-motion:reduce){.rider{animation:none;left:38%}}
+.stk2{position:relative}
+.stk2.off{opacity:.65}
+.stk2.off img{filter:grayscale(1) blur(1.5px)}
+.stk2.on{opacity:1;box-shadow:0 0 0 3px var(--red)}
+.lk{position:absolute;top:10px;left:10px;width:32px;height:32px;padding:7px;border-radius:50%;background:var(--ink);stroke:var(--paper);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.rbtn{min-height:52px;padding:0 26px;border:0;border-radius:999px;background:var(--red);color:#fff;font:700 18px var(--body);align-self:flex-start}
+.rbtn.alt{background:transparent;color:var(--red);box-shadow:inset 0 0 0 2px var(--red)}
+.rst p{margin:0 0 4px;font-weight:700;font-size:18px}
+.vid{margin-top:16px}
+.vid video{display:block;width:100%;aspect-ratio:16/9;border-radius:var(--t-r);background:#000;object-fit:cover}
+.vid .info{top:10px;bottom:auto}
+.vid .credpop{top:10px;bottom:auto}
+.memo{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.mc{position:relative;aspect-ratio:4/3;padding:0;border:0;overflow:hidden;border-radius:var(--t-r);background:var(--t-acc);color:var(--t-on);font:clamp(28px,6vw,48px) var(--t-font);box-shadow:var(--t-sh)}
+.mc img{display:block;width:100%;height:100%;object-fit:cover}
+.mc span{position:absolute;left:0;right:0;bottom:0;padding:3px 8px;background:var(--t-panel);color:var(--t-pi);font:700 12px var(--body);text-align:left}
+.mc span:empty{display:none}
+.mc.ok{opacity:.6}
+.opts{display:flex;flex-direction:column;gap:12px;margin:18px 0}
+.opt{min-height:60px;padding:0 20px;border:0;border-radius:var(--t-btn);background:var(--t-panel);color:var(--t-pi);font:clamp(22px,3.4vw,30px) var(--t-font);box-shadow:var(--t-sh)}
+.opt.good{background:#1F7A4A;color:#fff}
+.opt.bad{opacity:.5;text-decoration:line-through}
+.zoomimg{aspect-ratio:4/3;border:10px solid var(--t-panel);border-radius:var(--t-r);background-repeat:no-repeat;background-color:#ccc;box-shadow:var(--t-sh);transition:background-size .6s,background-position .6s}
+[data-sw]:focus-visible circle{stroke:#000;stroke-width:5}
+@media (max-width:760px){.memo{grid-template-columns:repeat(3,minmax(0,1fr))}.hero,.tp,.setup,.era{grid-template-columns:minmax(0,1fr)}.collage{height:400px}.mini{width:calc(50% - 7px)}}
+@media (prefers-reduced-motion:reduce){.tile.bad{animation:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="bar"><button class="brand" data-go="home">Carnet de gares</button><nav class="nav" id="nav" aria-label="Explorer"></nav></header>
+  <main id="app"></main>
+</div>
+<script>
+const LAND="M487,219 L480,223 L482,227 L480,231 L472,241 L468,247 L462,253 L459,261 L449,271 L448,280 L447,289 L443,294 L453,291 L455,283 L462,281 L475,281 L476,289 L478,297 L482,302 L482,309 L475,313 L480,322 L482,329 L489,335 L487,342 L480,348 L473,349 L469,354 L473,359 L480,365 L484,373 L480,377 L477,384 L478,390 L482,398 L488,402 L496,407 L504,405 L510,409 L505,416 L502,425 L496,429 L490,433 L485,438 L480,442 L476,446 L470,450 L470,453 L467,458 L458,464 L450,464 L445,464 L439,465 L434,461 L428,459 L419,456 L416,450 L405,446 L400,450 L389,447 L382,444 L370,438 L357,446 L346,453 L333,465 L331,484 L334,495 L334,500 L327,498 L320,501 L312,505 L305,502 L296,501 L290,501 L285,498 L283,492 L276,489 L271,490 L267,485 L259,485 L250,480 L240,478 L237,486 L229,484 L223,484 L216,485 L206,479 L199,479 L193,481 L187,475 L181,471 L170,467 L165,464 L159,464 L162,455 L155,455 L148,450 L156,441 L162,418 L168,381 L174,377 L170,371 L168,366 L171,332 L177,330 L186,344 L190,352 L186,335 L176,324 L167,314 L173,309 L174,300 L169,294 L172,288 L166,285 L158,280 L146,275 L136,259 L139,245 L130,240 L132,232 L123,231 L118,226 L119,220 L115,217 L106,219 L107,216 L110,212 L102,215 L97,220 L93,212 L94,206 L87,208 L80,203 L80,202 L71,203 L63,198 L55,199 L48,203 L45,192 L35,190 L42,186 L51,184 L48,180 L41,178 L41,173 L46,175 L54,175 L45,172 L41,171 L33,171 L32,163 L39,159 L46,155 L55,153 L63,151 L68,155 L74,153 L79,151 L82,146 L91,144 L98,146 L102,151 L107,158 L112,162 L121,155 L126,157 L132,158 L137,158 L138,158 L143,153 L151,157 L158,153 L154,145 L155,136 L153,123 L146,115 L144,105 L141,97 L147,98 L158,99 L166,98 L165,106 L172,116 L187,117 L201,118 L219,114 L225,111 L218,108 L224,96 L237,89 L250,86 L268,77 L279,71 L274,65 L274,58 L275,45 L278,32 L287,26 L299,23 L313,21 L315,33 L324,40 L332,37 L339,42 L340,51 L349,53 L355,60 L363,62 L372,65 L373,73 L373,79 L379,82 L390,81 L399,71 L399,78 L400,84 L404,91 L412,97 L418,102 L424,108 L433,106 L440,108 L449,110 L460,110 L466,117 L471,124 L477,126 L481,124 L488,129 L496,128 L502,130 L510,133 L519,133 L529,138 L521,149 L513,158 L510,171 L505,183 L506,193 L503,206 L502,217 L499,220 L490,223Z M574,532 L574,537 L573,544 L570,547 L573,547 L570,549 L569,552 L570,553 L567,557 L565,559 L562,558 L560,554 L555,552 L553,549 L550,547 L551,545 L555,542 L551,540 L548,540 L548,535 L551,532 L549,529 L545,529 L544,526 L547,523 L549,521 L546,518 L542,516 L543,513 L544,510 L547,509 L544,505 L542,505 L544,501 L546,498 L548,493 L551,493 L554,489 L559,489 L562,485 L566,484 L570,487 L572,482 L571,474 L572,468 L576,470 L577,476 L576,487 L579,495 L580,513 L576,524 L574,532Z";
+const CITY={Paris:[305,144],Lyon:[400,316],Bordeaux:[193,367],Marseille:[420,452],Lille:[332,45],Strasbourg:[511,159],Nantes:[156,235],Rennes:[151,185],Toulouse:[270,435],Nice:[493,430]};
+// L = ligne à grande vitesse, C = ligne classique. Les poids favorisent L : Lyon–Bordeaux passe alors par Paris.
+const EDGES=[['Paris','Lille','L'],['Paris','Strasbourg','L'],['Paris','Rennes','L'],['Paris','Nantes','L'],['Paris','Bordeaux','L'],['Paris','Lyon','L'],['Lyon','Marseille','L'],['Marseille','Nice','C'],['Marseille','Toulouse','C'],['Toulouse','Bordeaux','C'],['Rennes','Nantes','C']];
+const SH={hard:'6px 6px 0 rgba(0,0,0,.35)',soft:'0 14px 30px -12px rgba(0,0,0,.45)',none:'none'};
+// thème : fond, texte sur fond, panneau, texte sur panneau, accent, texte sur accent, police, rayon, rayon des boutons, ombre
+const T=(bg,ink,panel,pi,acc,on,font,r,btn,sh)=>({bg,ink,panel,pi,acc,on,font,r,btn,sh:SH[sh]});
+const TRAINS=[
+{id:'picasso',name:'Autorail Picasso',word:'PICASSO',era:1,yrs:'1950–1988',speed:120,img:'picasso',pos:'50% 50%',by:'Jeanluc42',lic:'CC BY-SA 3.0',sub:`L'autorail à la cabine sur le toit`,t:T('#E6D2B5','#3A1E1E','#FBF3E4','#3A1E1E','#A3202E','#FFFFFF','Abril Fatface',4,'8px','hard'),stats:[['120','km/h'],['62 + 5','places assises + strapontins'],['1950–88','en service'],['Diesel','moteur Saurer ou Renault']],blurb:`Surnommé Picasso parce que le conducteur est installé dans une cabine sur le toit, décalée sur le côté, comme un visage dans un tableau de Picasso. Il desservait les lignes de campagne, peint en rouge et crème.`},
+{id:'cc6500',name:'CC 6500 Grand Confort',word:'CONFORT',era:1,yrs:'1969–2007',speed:200,img:'cc6500',pos:'70% 50%',by:'Phil Richards',lic:'CC BY-SA 2.0',sub:'La locomotive « coup de soleil »',t:T('#C9CCCE','#1F2327','#F2F3F4','#1F2327','#A3202E','#FFFFFF','Inter Tight',6,'0','hard'),stats:[['200','km/h'],['1,5 kV','électrique, courant continu'],['1969–75','mises en service'],['3','couleurs : gris, rouge, orange']],blurb:`Le designer Paul Arzens l'a peinte dans sa livrée « coup de soleil » : gris métallisé, rouge Capitole et orange. Elle tractait des trains célèbres comme le Mistral et le Capitole.`},
+{id:'capitole',name:'BB 9200 Le Capitole',word:'CAPITOLE',era:1,yrs:'1957–2015',speed:200,img:'capitole',pos:'55% 50%',by:'andreboeni',lic:'CC BY 2.0',sub:'La locomotive rouge de Paris–Toulouse',t:T('#A3202E','#F7EFE3','#EADFC8','#23262B','#EADFC8','#A3202E','Cinzel',6,'6px','hard'),stats:[['1967','premier train voyageurs à 200 km/h'],['1957–64','locomotives construites'],['Paris – Toulouse','ligne du Capitole'],['Rouge','avec un bandeau gris clair']],blurb:`En 1967, le Capitole inaugure le premier service voyageurs à 200 km/h en France. La photo montre la BB 9291 dans un musée, avec son écusson ailé.`},
+{id:'caravelle',name:'Autorail Caravelle',word:'CARAVELLE',era:1,yrs:'1963–2010',speed:120,img:'caravelle',pos:'50% 50%',by:'jhm0284',lic:'CC BY-SA 2.0',sub:'Rouge et crème pendant presque cinquante ans',t:T('#A3202E','#FFF4E6','#F3E9D2','#3A1E1E','#F3E9D2','#A3202E','Oswald',0,'0','hard'),stats:[['120','km/h'],['133–141','places assises'],['1963–2010','en service'],['Diesel','boîte mécanique']],blurb:`La Caravelle a roulé en Auvergne, en Normandie, en Bourgogne, en Bretagne et dans bien d'autres régions. Plus tard, chaque région a choisi sa couleur.`},
+{id:'corail',name:'Corail',word:'CORAIL',era:2,yrs:'depuis 1975',img:'corail',video:{f:'corail',by:'wl/trains',lic:'CC BY 3.0'},pos:'45% 55%',by:'Skililipappa',lic:'CC BY-SA 4.0',sub:'Des voitures confortables aux portes orange',t:T('#E75B12','#1A1D21','#CBD0CC','#1A1D21','#434B4D','#F3F0E6','Archivo',4,'0','hard'),stats:[['1975','début des voitures Corail'],['160','km/h'],['58–88','places par voiture'],['2',`systèmes d'alimentation (BB 22200)`]],blurb:`Les premiers Corail roulent entre Paris et Bordeaux en juin 1975. Les voitures ont une bande anthracite et des portes orange. La locomotive de la photo est une BB 22200, dans sa livrée grise d'aujourd'hui.`},
+{id:'sudest',name:'TGV Sud-Est',word:'SUDEST',era:2,yrs:'depuis 1980',speed:270,img:'orange',pos:'35% 60%',by:'Phillip Capper',lic:'CC BY 2.0',sub:'Le premier TGV, tout en orange',t:T('#E8681C','#1E1A17','#FFF1DD','#1E1A17','#1E1A17','#FFF1DD','Barlow Condensed',0,'0','none'),stats:[['260 → 270','km/h'],['368','places assises'],['200 m','de long'],['1981',`27 septembre : ouverture de la ligne`]],blurb:`Construit à partir de 1978, en orange vif. La ligne à grande vitesse Paris–Lyon ouvre le 27 septembre 1981. Au début, seuls quelques trains peuvent circuler.`},
+{id:'poste',name:'TGV La Poste',word:'POSTE',era:2,yrs:'1984–2015',speed:270,img:'poste',pos:'70% 70%',by:'Florian Fèvre',lic:'CC BY-SA 4.0',sub:'Le train jaune de nuit pour les lettres',t:T('#FFCD00','#293133','#FFF8D6','#293133','#293133','#FFCD00','Outfit',22,'999px','soft'),stats:[['1984–2015','années de service'],['270','km/h'],['0','voyageur : seulement du courrier'],['Paris → Cavaillon','la nuit, par Mâcon']],blurb:`Un TGV jaune sans voyageurs. La nuit, il transportait des lettres et des colis pour La Poste. Son dernier voyage a eu lieu le 27 juin 2015.`},
+{id:'z5600',name:'RER C Z 5600',word:'RER',era:2,yrs:'depuis 1982',speed:140,img:'z5600',pos:'50% 50%',by:'Remontees',lic:'CC BY-SA 4.0',sub:'Le train de banlieue autour de Paris',t:T('#E4E8F2','#0B1B3F','#FFFFFF','#0B1B3F','#0033A0','#FFFFFF','IBM Plex Sans',10,'0','none'),stats:[['140','km/h'],['1 021','places dans un train de 4 voitures'],['1982','premier service'],['1,5 kV','électrique']],blurb:`Un train de banlieue du RER C. Aux heures de pointe, des centaines de personnes montent à bord, debout ou assises.`},
+{id:'atlantique',name:'TGV Atlantique',word:'TGV',era:3,yrs:'depuis 1989',speed:300,img:'atlantique',pos:'30% 45%',by:'MakotoVRC',lic:'CC0',sub:'Argent et bleu, avec un record du monde sur le nez',t:T('#1F3AA8','#FFFFFF','#E4E7EB','#1B2540','#FFFFFF','#1F3AA8','Figtree',18,'999px','soft'),stats:[['300','km/h'],['485','places assises'],['237 m','de long'],['1989','premiers voyageurs']],blurb:`Dessiné par Roger Tallon. La rame 325, sur la photo, porte 515,3 km/h sur le nez : le record du monde de vitesse.`},
+{id:'duplex',name:'TGV Duplex',word:'DUPLEX',era:3,yrs:'depuis 1995',speed:320,img:'duplex',video:{f:'duplex',by:'JMoaetlh',lic:'CC BY-SA 3.0'},pos:'50% 28%',by:'Kabelleger / David Gubler',lic:'CC BY-SA 4.0',sub:'Le TGV à deux étages',t:T('#1A2B3C','#F2F4F7','#DDE3EA','#1A2B3C','#B3174F','#FFFFFF','DM Sans',14,'14px','soft'),stats:[['320','km/h'],['510','places assises'],['200 m','de long'],['1995','premier service']],blurb:`Deux étages, donc plus de place pour les voyageurs. Certains Duplex ont ensuite pris les couleurs d'Ouigo. Celui-ci traverse le viaduc de Cize-Bolozon.`},
+{id:'teoz',name:'Corail Téoz',word:'TEOZ',era:3,yrs:'2003–2012',speed:200,img:'teoz',pos:'40% 50%',by:'patrick janicek',lic:'CC BY 2.0',sub:'Des voitures jaunes, bleues et vertes',t:T('#F2B705','#2A2420','#FFF6D6','#2A2420','#2F6FB0','#FFFFFF','Rubik',12,'12px','hard'),stats:[['200','km/h'],['401','places dans 7 voitures'],['2003–2012','les années Téoz'],['Jaune · bleu · vert','1re classe · 2e classe · service']],blurb:`Des voitures Corail rénovées pour les grandes lignes sans TGV, comme Paris–Clermont-Ferrand et Bordeaux–Nice. La marque disparaît le 2 janvier 2012.`},
+{id:'ater',name:'TER ATER X 73500',word:'ATER',era:3,yrs:'depuis 1999',speed:140,img:'ater',pos:'50% 50%',by:'Florian Pépellin',lic:'CC BY-SA 4.0',sub:'La petite baleine bleue',t:T('#0033A0','#FFFFFF','#E6EAF2','#0B1B3F','#007A3D','#FFFFFF','Public Sans',8,'8px','hard'),stats:[['140','km/h'],['61 + 21','places + strapontins'],['318','construits'],['Diesel','deux moteurs']],blurb:`Ses surnoms : Baleines bleues, Concombres et, quand deux circulent ensemble, Saucisses. Il dessert les lignes de campagne dans de nombreuses régions.`},
+{id:'agc',name:'TER AGC',word:'AGC',era:4,yrs:'depuis 2004',speed:160,img:'agc',pos:'50% 50%',by:'Yoyo697',lic:'CC BY-SA 4.0',sub:`L'autorail à grande capacité`,t:T('#1E7A4E','#FFFFFF','#EAF3EE','#10361F','#FFFFFF','#1E7A4E','Montserrat',16,'999px','soft'),stats:[['160','km/h'],['163–272','places assises'],['2004','première livraison'],['Bimode','diesel ou électrique']],blurb:`AGC veut dire autorail à grande capacité. Certaines versions passent du diesel aux fils électriques.`},
+{id:'ter2n',name:'TER 2N NG',word:'TER',era:4,yrs:'2004–2010',speed:160,img:'ter2n',pos:'60% 50%',by:'Pierre Poschadel',lic:'CC BY-SA 4.0',sub:'Un train à deux étages pour la région',t:T('#00387B','#FFFFFF','#E5E8EC','#0B1B3F','#E5E8EC','#00387B','Inter Tight',6,'0','none'),stats:[['160','km/h'],['219–570','places selon la longueur'],['2004–10','livraisons'],['2 étages','à deux niveaux']],blurb:`Sur cette photo, le TER 2N NG est à côté de son cadet, un Regio 2N, à Saint-Quentin.`},
+{id:'regio2n',name:'TER Regio 2N',word:'REGIO',era:4,yrs:'depuis 2014',img:'regio2n',pos:'50% 50%',by:'RAIL P (RAIL.PHOTOGRAPHY)',lic:'CC0',sub:'Le grand TER à deux étages',t:T('#6B7480','#FFFFFF','#F2F2F2','#23272E','#C8282D','#FFFFFF','Public Sans',10,'0','hard'),stats:[['160–200','km/h'],['350–770','places assises'],['2014','premier service'],['2 étages','à deux niveaux']],blurb:`Chaque région lui donne ses couleurs : BreizhGo en Bretagne, Aléop en Pays de la Loire, et d'autres.`},
+{id:'regiolis',name:'Régiolis',word:'REGIOLIS',era:4,yrs:'depuis 2014',speed:160,img:'regiolis',video:{f:'regiolis',by:'Manchesterunited1234',lic:'CC BY-SA 4.0'},pos:'50% 50%',by:'RAIL P (RAIL.PHOTOGRAPHY)',lic:'CC0',sub:'Bimode : diesel et électrique',t:T('#2F3234','#F2EFEC','#E8E4E1','#23272E','#B3174F','#FFFFFF','DM Sans',12,'12px','soft'),stats:[['160','km/h'],['220–360','places assises'],['2014','premier voyage : 22 avril'],['Bimode','diesel + électrique']],blurb:`Son premier voyage a emmené des voyageurs de Bordeaux à Agen le 22 avril 2014. Il circule aujourd'hui dans onze régions.`},
+{id:'ouigo',name:'OUIGO',word:'OUIGO',era:5,yrs:'depuis 2013',img:'ouigo',pos:'60% 55%',by:'Hoff1980',lic:'CC BY-SA 3.0',sub:'Le TGV à petit prix',t:T('#00B6E3','#0B2A3A','#FFFFFF','#0B2A3A','#D0006F','#FFFFFF','Manrope',28,'999px','soft'),stats:[['634','places dans un train'],['510','dans un TGV Duplex normal'],['2013','lancé en avril'],['2 étages','à deux niveaux']],blurb:`Un TGV avec plus de places et des prix plus bas, pour que plus de monde puisse voyager. Il démarre le 2 avril 2013.`},
+{id:'inoui',name:'TGV inOui',word:'INOUI',era:5,yrs:'depuis 2017',speed:300,img:'inoui',pos:'75% 45%',by:'A.lloyd999ify',lic:'CC BY-SA 4.0',sub:'Une vieille rame Atlantique aux couleurs neuves',t:T('#F4F1EE','#23272E','#FFFFFF','#23272E','#B3174F','#FFFFFF','Nunito',32,'999px','soft'),stats:[['300','km/h'],['≈ 450','places après rénovation'],['237 m','de long'],['2017','naissance du nom inOui']],blurb:`Le nom TGV inOui est présenté en 2017 et concerne aujourd'hui tous les TGV classiques. Celui-ci est une rame Atlantique en gris, blanc et framboise.`},
+{id:'jaune',name:'Le Train Jaune',word:'JAUNE',era:6,yrs:'depuis 1910',speed:60,img:'jaune',pos:'20% 60%',by:'Mike McBey',lic:'CC BY 2.0',sub:'Le petit train jaune des Pyrénées',t:T('#F2B705','#2A2420','#FBF6E6','#2A2420','#B5232A','#FFFFFF','Abril Fatface',24,'999px','soft'),stats:[['60','km/h au maximum'],['850 V','courant par un troisième rail'],['1 592 m','Bolquère-Eyne, plus haute gare SNCF'],['1910','ouverture du premier tronçon']],blurb:`Jaune canari et rouge, les couleurs catalanes. Il grimpe de Villefranche-de-Conflent à Latour-de-Carol à travers la montagne.`}
+];
+const ERAS=[[1,'Les grands trains','1950 – 1975','#A3202E'],[2,'Corail et orange','1975 – 1988','#E8681C'],[3,'Argent et bleu','1989 – 2003','#1F3AA8'],[4,'Le TER partout','2004 – 2017','#1E7A4E'],[5,'Ouigo et inOui','2013 →','#00B6E3'],[6,'Toujours là','1910 →','#F2B705']];
+/* icônes des fiches : une par type d'information */
+const IC={
+kbd:'<text x="12" y="15.4" text-anchor="middle" style="fill:var(--t-acc);stroke:none;font:800 9.5px Lato,sans-serif;letter-spacing:.2px">TGV</text>',
+memo:'<rect x="3" y="5" width="9" height="13" rx="1.5"/><rect x="12" y="7" width="9" height="13" rx="1.5"/>',
+clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+fork:'<path d="M3 12h7c4 0 4-6 11-6M10 12c4 0 4 6 11 6"/>',
+search:'<circle cx="11" cy="11" r="6"/><path d="M16 16l5 5"/>',
+gauge:'<path d="M4 17a8 8 0 1 1 16 0"/><path d="M12 17l4-6"/><circle cx="12" cy="17" r="1.3"/>',
+seat:'<path d="M8 4v9h8l2 7"/><path d="M8 13v7"/><path d="M5 20h14"/>',
+cal:'<rect x="4" y="6" width="16" height="14" rx="2"/><path d="M4 11h16M9 4v4M15 4v4"/>',
+len:'<path d="M3 12h18M6 9l-3 3 3 3M18 9l3 3-3 3"/>',
+bolt:'<path d="M13.5 2L5 13.5h6L9.5 22 19 9.5h-6.5z" style="fill:var(--t-on)"/>',
+engine:'<circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/>',
+layers:'<path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/>',
+palette:'<path d="M12 3a9 9 0 1 0 0 18c1.5 0 2-1 1.5-2s0-2 1.5-2h2a4 4 0 0 0 4-4c0-5-4-10-9-10z"/><circle cx="8" cy="11" r="1"/><circle cx="12" cy="7.5" r="1"/><circle cx="16" cy="11" r="1"/>',
+route:'<circle cx="6" cy="18" r="2"/><circle cx="18" cy="6" r="2"/><path d="M8 18h6a3 3 0 0 0 0-6h-4a3 3 0 0 1 0-6h6"/>',
+mail:'<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 8l9 6 9-6"/>',
+mount:'<path d="M3 19l6-10 4 6 3-4 5 8z"/>',
+stack:'<path d="M3 8l9-4 9 4-9 4z"/><path d="M3 12l9 4 9-4M3 16l9 4 9-4"/>'};
+function ico(v,l){
+  const x=(v+' '+l).toLowerCase();
+  const k=/courrier/.test(x)?'mail'
+    :/^\d{4}/.test(v)?'cal'
+    :/km\/h/.test(x)?'gauge'
+    :/gare|plus haute/.test(x)?'mount'
+    :/kv|\bv\b|volt|alimentation|électrique|bimode|diesel|moteur/.test(x)?'bolt'
+    :/place|dans un/.test(x)?'seat'
+    :/de long/.test(x)?'len'
+    :/diesel|moteur/.test(x)?'engine'
+    :/étage/.test(x)?'layers'
+    :/couleur|rouge|jaune|bandeau/.test(x)?'palette'
+    :/paris|toulouse|cavaillon|ligne/.test(x)?'route'
+    :'stack';
+  return `<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${IC[k]}</svg>`;
+}
+const credBtn=(t,k='Photo')=>`<button class="info" data-act="cred" aria-expanded="false" aria-label="Crédit ${k.toLowerCase()}">i</button><div class="credpop" hidden>${k} ${t.by} · ${t.lic} · Wikimedia Commons</div>`;
+const $=s=>document.querySelector(s);
+const byId=id=>TRAINS.find(t=>t.id===id);
+const th=t=>`--t-bg:${t.bg};--t-ink:${t.ink};--t-panel:${t.panel};--t-pi:${t.pi};--t-acc:${t.acc};--t-on:${t.on};--t-font:'${t.font}',Georgia,sans-serif;--t-r:${t.r}px;--t-btn:${t.btn};--t-sh:${t.sh}`;
+const photo=t=>`photos/${t.img}.jpg`;
+const lum=h=>{const v=[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)/255).map(c=>c<=.03928?c/12.92:Math.pow((c+.055)/1.055,2.4));return .2126*v[0]+.7152*v[1]+.0722*v[2]};
+const line=t=>[t.t.acc,t.t.ink,'#C8282D'].find(c=>lum(c)<.3)||'#C8282D';
+let save={seen:[],trips:0};
+try{const s=JSON.parse(localStorage.getItem('carnet-v1')||'null');if(s&&Array.isArray(s.seen))save=s}catch(e){}
+const persist=()=>{try{localStorage.setItem('carnet-v1',JSON.stringify(save))}catch(e){}};
+const unlockedN=()=>Math.min(TRAINS.length,1+save.trips);
+const unlocked=t=>TRAINS.indexOf(t)<unlockedN();
+const S={v:'home',id:'picasso',cities:['Paris','Lyon','Bordeaux'],pick:'picasso',play:null,sg:null,confirm:false,gt:'picasso',gk:null,g:null};
+
+function route(a,b){
+  const w=(x,y,k)=>Math.hypot(CITY[x][0]-CITY[y][0],CITY[x][1]-CITY[y][1])*(k==='L'?0.6:1.4);
+  const dist={[a]:0},prev={},todo=new Set(Object.keys(CITY));
+  while(todo.size){let u=null;todo.forEach(n=>{if(dist[n]!==undefined&&(u===null||dist[n]<dist[u]))u=n});if(u===null||u===b)break;todo.delete(u);
+    EDGES.forEach(([x,y,k])=>{const v=x===u?y:y===u?x:null;if(v&&todo.has(v)){const d=dist[u]+w(x,y,k);if(dist[v]===undefined||d<dist[v]){dist[v]=d;prev[v]=u}}})}
+  const out=[b];while(out[0]!==a)out.unshift(prev[out[0]]);return out;
+}
+const pathD=names=>names.map((n,i)=>(i?'L':'M')+CITY[n].join(',')).join(' ');
+
+function mapSVG(opts){
+  const {sel=[],legs=[],acc='#C8282D',land='#fff',ink='#222',stroke='#999'}=opts;
+  const dots=Object.keys(CITY).map(n=>{const [x,y]=CITY[n],on=sel.includes(n);return `<circle cx="${x}" cy="${y}" r="${on?13:6}" fill="${on?acc:stroke}" stroke="${land}" stroke-width="4"/><text x="${x+(on?18:11)}" y="${y+(on?-12:5)}" font-size="${on?22:14}" font-weight="700" fill="${ink}" stroke="${land}" stroke-width="5" paint-order="stroke" font-family="Lato,sans-serif">${n}</text>`}).join('');
+  const lines=legs.map(l=>`<path d="${pathD(l)}" fill="none" stroke="${acc}" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>`).join('');
+  return `<svg viewBox="0 0 600 579" id="map" role="img" aria-label="Carte de la France avec des lignes de chemin de fer"><path d="${LAND}" fill="${land}" stroke="${stroke}" stroke-width="2" stroke-linejoin="round"/><g fill="none" stroke="${stroke}" stroke-width="2" stroke-dasharray="2 6">${EDGES.map(([a,b])=>`<path d="${pathD([a,b])}"/>`).join('')}</g><g id="done">${lines}</g><g id="live"></g>${dots}</svg>`;
+}
+
+function nav(){
+  const items=[['eras','Époques'],['album','Mon album']];
+  const cur=['train','journey','speed','memo','heure','rail','bon'].includes(S.v)?'eras':S.v;
+  $('#nav').innerHTML=items.map(([k,l])=>`<button data-go="${k}" ${cur===k?'aria-current="page"':''}>${l}</button>`).join('');
+}
+const mini=t=>{const lock=!unlocked(t);return `<button class="mini ${lock?'lock':''}" data-train="${t.id}" style="${th(t.t)}" aria-label="${t.name}${lock?', verrouillé':''}"><img src="${photo(t)}" alt="" style="object-position:${t.pos}"><span>${t.name}<small>${lock?'Verrouillé':t.yrs}</small></span></button>`};
+
+function home(){
+  return `<section class="hero"><div class="collage" aria-hidden="true"><figure style="left:0;top:0;width:38%;height:54%;transform:rotate(-4deg)"><img src="photos/duplex.jpg" alt=""><figcaption>TGV Duplex</figcaption></figure><figure style="left:31%;top:-1%;width:38%;height:54%;transform:rotate(2deg)"><img src="photos/orange.jpg" alt=""><figcaption>TGV Sud-Est</figcaption></figure><figure style="right:0;top:1%;width:38%;height:54%;transform:rotate(4deg)"><img src="photos/capitole.jpg" alt=""><figcaption>Le Capitole</figcaption></figure><figure style="left:5%;bottom:0;width:38%;height:54%;transform:rotate(3deg)"><img src="photos/jaune.jpg" alt=""><figcaption>Le Train Jaune</figcaption></figure><figure style="left:33%;bottom:-1%;width:38%;height:54%;transform:rotate(-2deg)"><img src="photos/atlantique.jpg" alt=""><figcaption>TGV Atlantique</figcaption></figure><figure style="right:1%;bottom:1%;width:38%;height:54%;transform:rotate(-4deg)"><img src="photos/ouigo.jpg" alt=""><figcaption>Ouigo</figcaption></figure></div><div class="cta"><h1 class="sr">Bienvenue à bord !</h1><button class="go" data-go="eras">Monte à bord !</button></div></section><div class="track" aria-hidden="true"><div class="rider"><svg viewBox="0 0 640 64" width="640" height="64" role="presentation"><defs><g id="cw" fill="#3A2F2C"><rect x="0" width="11" height="8" rx="2"/><rect x="13" width="11" height="8" rx="2"/><rect x="26" width="11" height="8" rx="2"/><rect x="39" width="11" height="8" rx="2"/><rect x="52" width="11" height="8" rx="2"/><rect x="65" width="11" height="8" rx="2"/><rect x="78" width="11" height="8" rx="2"/><rect x="91" width="11" height="8" rx="2"/><rect x="104" width="11" height="8" rx="2"/></g><g id="bg" fill="#2A2420"><rect x="-13" y="48" width="26" height="3"/><circle cx="-7" cy="53" r="5"/><circle cx="7" cy="53" r="5"/></g><clipPath id="mc"><path d="M458 14H548C566 14 580 14 592 18C606 23 620 34 627 42Q631 45 629 46H458Z"/></clipPath></defs><line x1="0" y1="1.5" x2="640" y2="1.5" stroke="#2A2420" stroke-opacity=".45"/><rect x="8" y="14" width="148" height="32" rx="6" fill="#DDE1E6"/><use href="#cw" x="22" y="19"/><rect x="11" y="17" width="7" height="27" rx="1" fill="#C3C9D1"/><rect x="146" y="17" width="7" height="27" rx="1" fill="#C3C9D1"/><rect x="158" y="14" width="148" height="32" rx="2" fill="#DDE1E6"/><use href="#cw" x="172" y="19"/><rect x="161" y="17" width="7" height="27" rx="1" fill="#C3C9D1"/><rect x="296" y="17" width="7" height="27" rx="1" fill="#C3C9D1"/><rect x="308" y="14" width="148" height="32" rx="2" fill="#DDE1E6"/><use href="#cw" x="322" y="19"/><rect x="311" y="17" width="7" height="27" rx="1" fill="#C3C9D1"/><rect x="446" y="17" width="7" height="27" rx="1" fill="#C3C9D1"/><rect x="8" y="34" width="448" height="12" fill="#C8282D"/><rect x="8" y="32.5" width="448" height="1.4" fill="#fff"/><text x="20" y="43.5" font-family="Figtree,sans-serif" font-weight="800" font-size="9" fill="#fff" letter-spacing="1">TGV</text><path d="M458 14H548C566 14 580 14 592 18C606 23 620 34 627 42Q631 45 629 46H458Z" fill="#DDE1E6"/><g clip-path="url(#mc)"><rect x="458" y="34" width="175" height="12" fill="#C8282D"/><rect x="458" y="32.5" width="175" height="1.4" fill="#fff"/><rect x="600" y="40" width="40" height="6" fill="#5B6470"/></g><rect x="470" y="22" width="60" height="9" rx="1" fill="#C3C9D1"/><path d="M476 22v9M482 22v9M488 22v9M494 22v9M500 22v9M506 22v9M512 22v9M518 22v9M524 22v9" stroke="#9AA3AD"/><rect x="500" y="10" width="44" height="5" rx="1" fill="#B6BDC6"/><path d="M474 14L490 2L506 14M483 2H497" fill="none" stroke="#2A2420" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M583 17.5L594 18C602 21 608 26 611 31H589Z" fill="#2E2422"/><rect x="556" y="18" width="22" height="26" rx="2" fill="none" stroke="#B6BDC6"/><rect x="560" y="21" width="13" height="7" rx="2" fill="#3A2F2C"/><rect x="617" y="36" width="5" height="3" rx="1" fill="#F2D45C"/><rect x="623" y="38" width="4" height="3" rx="1" fill="#F2D45C"/><rect x="8" y="46" width="621" height="3" fill="#2A2420"/><use href="#bg" x="32"/><use href="#bg" x="157"/><use href="#bg" x="307"/><use href="#bg" x="457"/><use href="#bg" x="590"/></svg></div><div class="rails"></div></div>`;
+}
+function album(){
+  const n=unlockedN(),total=TRAINS.length,next=TRAINS[n];
+  const cards=TRAINS.map((t,i)=>{const on=i<n;return `<button class="stk2 ${on?'on':'off'}" data-train="${t.id}" aria-label="${on?t.name:'Train verrouillé'}"><img src="${photo(t)}" alt="" style="object-position:${t.pos}"><span>${on?t.name:'Verrouillé'}</span>${on?'':`<svg class="lk" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>`}</button>`}).join('');
+  const reset=S.confirm?`<div class="rst"><p>Tout effacer et repartir du premier train ?</p><div class="acts"><button class="rbtn" data-act="reset-yes">Oui, recommencer</button><button class="rbtn alt" data-act="reset-no">Non, garder</button></div></div>`:`<button class="rbtn alt" data-act="reset">Recommencer le jeu</button>`;
+  return `<section class="album" aria-label="Mon album" style="margin-top:24px"><div class="albumhead"><div><h1 style="font-family:var(--display);font-size:clamp(36px,6vw,60px);line-height:1;color:var(--red)">Mon album</h1><div class="count"><b>${n}</b> / ${total}</div><div class="small">trains débloqués</div></div><div class="small" style="max-width:30ch;font-size:15px">${next?'Réussis « Tape et roule » pour débloquer le train suivant.':'Bravo, tous les trains sont débloqués !'}</div>${next?`<img class="lp" src="${photo(next)}" alt="Le prochain train">`:''}</div><div class="stks2">${cards}</div>${reset}</section>`;
+}
+function eras(){
+  return `<div style="padding-block:24px 4px"><div class="eyebrow">Explorer par époque</div><h1 style="font-family:var(--display);font-size:clamp(36px,6vw,60px);line-height:1;color:var(--red)">De 1950 à aujourd'hui</h1></div>`+ERAS.map(([n,name,yrs,c])=>`<section class="era" aria-label="${name}"><div><div class="yrs">${yrs}</div><h2>${name}</h2><div style="height:10px;width:120px;background:${c};margin-top:12px"></div></div><div class="row">${TRAINS.filter(t=>t.era===n).map(mini).join('')}</div></section>`).join('');
+}
+function trainPage(){
+  const t=byId(S.id),lock=!unlocked(t);
+  const era=ERAS.find(e=>e[0]===t.era);
+  if(!lock&&!save.seen.includes(t.id)){save.seen.push(t.id);persist()}
+  return `<article class="th" style="${th(t.t)}"><div class="era-tag">${era[1]} · ${t.yrs}</div><div class="tp"><div><div class="phw"><figure class="frame"><img src="${photo(t)}" alt="${t.name}" style="object-position:${t.pos};${lock?'filter:grayscale(1) blur(6px)':''}"></figure>${credBtn(t)}</div>${t.video&&!lock?`<div class="phw vid"><video controls playsinline preload="metadata" poster="${photo(t)}" src="videos/${t.video.f}.mp4" aria-label="Vidéo : ${t.name}"></video>${credBtn(t.video,'Vidéo')}</div>`:''}</div>
+  <div><h1>${t.name}</h1><div class="sub">${t.sub}</div>${lock?`<div class="stats"><div class="stat" style="grid-column:1/-1"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><b>Verrouillé</b><span>Réussis « Tape et roule » avec le train d'avant pour débloquer celui-ci.</span></div></div>`:`<div class="stats">${t.stats.map(s=>`<div class="stat">${ico(s[0],s[1])}<b>${s[0]}</b><span>${s[1]}</span></div>`).join('')}</div><p class="blurb">${t.blurb}</p>`}
+  <div class="games" style="margin-top:22px"><button class="game" data-pick="${t.id}" ${lock?'disabled':''}><svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${IC.kbd}</svg><b>Tape et roule</b></button>${otherCard(t,lock)}</div></div></div></div>
+  </article>`;
+}
+function journey(){
+  const t=byId(S.pick),c=S.cities,ready=c.length===3,left=3-c.length;
+  let legs=[];
+  if(ready){for(let i=0;i<2;i++)legs.push(route(c[i],c[i+1]));S.play={t,legs,i:0,idx:0,over:false}}else S.play=null;
+  return `<article class="th" style="${th(t.t)}"><div class="era-tag" id="legtxt">Tape et roule · ${t.name}</div><div class="setup"><div class="mapcard">${mapSVG({sel:c,acc:line(t),land:'#fff',ink:'#23262B',stroke:'#9aa0a6'})}</div>
+  <div><h1 style="font-size:clamp(32px,4.6vw,56px)">${ready?'On part !':'Choisis 3 villes'}</h1><div class="pills" style="margin:16px 0" role="group" aria-label="Villes">${Object.keys(CITY).map(n=>`<button class="pill" data-city="${n}" aria-pressed="${c.includes(n)}">${n}</button>`).join('')}</div>
+  <div class="banner" id="msg" aria-live="polite" style="text-align:left;min-height:56px">${ready?'':`Choisis encore ${left} ${left>1?'villes':'ville'}, puis tape « ${t.word} » pour faire avancer le train.`}</div>
+  <div class="tiles" id="tiles" aria-label="Lettres à taper">${ready?'':[...t.word].map(ch=>`<span class="tile">${ch}</span>`).join('')}</div>
+  <input id="typer" type="text" inputmode="text" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Tape le nom du train" ${ready?'':'disabled'} placeholder="${ready?`Tape ${t.word} ici`:'Choisis d\'abord 3 villes'}"><div id="end"></div></div></div></article>`;
+}
+/* ---- Devine la vitesse ---- */
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const MAXTRIES=6,SLACK=10;
+function startSpeed(only){
+  const pool=TRAINS.filter(t=>t.speed&&unlocked(t));
+  const order=only?[only]:shuffle(pool).slice(0,5).map(t=>t.id);
+  S.sg={order,r:0,tries:[],score:0,phase:'ask',gv:150,solo:!!only};S.v='speed';render();
+}
+function speed(){
+  const g=S.sg;
+  if(!g)return `<div style="padding-block:24px"><div class="eyebrow">Jouer à</div><h1 style="font-family:var(--display);font-size:clamp(36px,6vw,60px);line-height:1;color:var(--red)">Plus ou moins</h1><p style="max-width:52ch;font-size:18px">Cinq trains, six essais pour chacun. Après chaque essai, on te dit « plus haut » ou « plus bas ». Tu gagnes si tu tombes à ${SLACK} km/h près de la vitesse maximale en service.</p><div class="acts"><button class="btn" style="background:var(--red);color:#fff;display:inline-flex;align-items:center;min-height:56px;padding:0 28px;border:0;border-radius:999px;font-family:var(--display);font-size:24px" data-act="speedstart">C'est parti ▸</button></div></div>`;
+  if(g.phase==='end'){
+    const max=g.order.length*(MAXTRIES);
+    return `<article class="th" style="${th(byId(g.order[g.order.length-1]).t)}"><div class="end"><h2>${g.solo?'Terminé !':'Bravo !'}</h2><p style="font-family:var(--body);font-size:20px">Score : <b>${g.score}</b> sur ${max}.</p><div class="acts" style="justify-content:center"><button class="btn" data-act="speedstart">Rejouer</button><button class="btn alt" data-go="eras">Voir les trains</button></div></div></article>`;
+  }
+  const t=byId(g.order[g.r]),tr=g.tries,last=tr[tr.length-1],over=g.phase!=='ask';
+  const hint=last&&!over?(last.v<t.speed?'Plus haut ↑':'Plus bas ↓'):'';
+  const closing=g.phase==='win'?`Bravo ! Il roule à ${t.speed} km/h. Tu étais à ${Math.abs(last.v-t.speed)} km/h près.`:`C'était ${t.speed} km/h.`;
+  const lastOne=g.r===g.order.length-1;
+  return `<article class="th" style="${th(t.t)}"><div class="era-tag">${g.solo?'Une seule question':`Train ${g.r+1} sur ${g.order.length}`} · Essai ${Math.min(tr.length+(over?0:1),MAXTRIES)} sur ${MAXTRIES} · Score ${g.score}</div><div class="tp"><div class="phw"><figure class="frame"><img src="${photo(t)}" alt="${t.name}" style="object-position:${t.pos}"></figure>${credBtn(t)}</div>
+  <div><h1 style="font-size:clamp(36px,5vw,64px)">${t.name}</h1><div class="sub">À quelle vitesse maximale roule-t-il ?</div>
+  <div class="big" id="sg-big">${g.gv}<small> km/h</small></div>
+  <input class="rng" id="sg-range" type="range" min="0" max="350" step="5" value="${g.gv}" aria-label="Vitesse en km/h" ${over?'disabled':''}>
+  <div class="stepper"><button class="btn alt" data-step="-10" ${over?'disabled':''}>−10</button><button class="btn alt" data-step="-1" ${over?'disabled':''}>−1</button><button class="btn alt" data-step="1" ${over?'disabled':''}>+1</button><button class="btn alt" data-step="10" ${over?'disabled':''}>+10</button></div>
+  <input id="sg-in" type="number" inputmode="numeric" min="0" max="400" value="${g.gv}" aria-label="Ta réponse" ${over?'disabled':''}>
+  <div class="hint" aria-live="polite">${over?closing:hint}</div>
+  ${over?`<div class="acts" style="justify-content:center"><button class="btn" data-act="next">${lastOne?'Voir mon score':'Train suivant ▸'}</button></div>`:`<div class="acts" style="justify-content:center"><button class="btn" data-act="guess">Valider</button></div>`}
+  <ul class="hist" aria-label="Tes essais">${tr.map(x=>`<li>${x.v} km/h ${x.v===t.speed||Math.abs(x.v-t.speed)<=SLACK?'✓':x.v<t.speed?'↑':'↓'}</li>`).join('')}</ul>
+  <p class="cred">Vitesse maximale en service. Tu gagnes à ${SLACK} km/h près.</p></div></div></article>`;
+}
+function setGv(v){
+  const g=S.sg;v=Math.max(0,Math.min(400,Math.round(v)));g.gv=v;
+  const r=$('#sg-range'),n=$('#sg-in'),b=$('#sg-big');
+  if(r)r.value=Math.min(v,350);if(n)n.value=v;if(b)b.firstChild.nodeValue=v;
+}
+function guess(){
+  const g=S.sg,t=byId(g.order[g.r]),v=Number($('#sg-in').value);
+  if(!Number.isFinite(v))return;
+  g.tries.push({v});
+  if(Math.abs(v-t.speed)<=SLACK){g.phase='win';g.score+=Math.max(1,MAXTRIES+1-g.tries.length)}
+  else if(g.tries.length>=MAXTRIES)g.phase='lose';
+  g.gv=v;render(true);
+}
+function nextSpeed(){
+  const g=S.sg;
+  if(g.r<g.order.length-1){g.r++;g.tries=[];g.phase='ask';g.gv=150;render()}
+  else{g.phase='end';render()}
+}
+function render(keep){
+  nav();
+  $('#app').innerHTML=S.v==='home'?home():S.v==='eras'?eras():S.v==='train'?trainPage():S.v==='journey'?journey():S.v==='album'?album():S.v==='memo'?memo():S.v==='heure'?heure():S.v==='rail'?rail():S.v==='bon'?bon():speed();
+  if(S.v==='journey'&&S.play)initPlay();
+  if(S.v==='speed'&&S.sg&&S.sg.phase==='ask'&&$('#sg-in')){
+    $('#sg-range').addEventListener('input',e=>setGv(e.target.value));
+    $('#sg-in').addEventListener('input',e=>setGv(e.target.value===''?0:e.target.value));
+    $('#sg-in').addEventListener('keydown',e=>{if(e.key==='Enter')guess()});
+  }
+  if(!keep)window.scrollTo(0,0);
+}
+
+/* ---- Voyage : taper le nom du train ---- */
+let anim=0;
+function initPlay(){
+  const P=S.play,live=$('#live'),t=P.t;
+  live.innerHTML=`<path id="guide" fill="none" stroke="${t.t.ink}" stroke-opacity=".35" stroke-width="5" stroke-dasharray="4 10"/><path id="trail" fill="none" stroke="${line(t)}" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+  <g id="tok"><clipPath id="cl"><circle r="30"/></clipPath><circle r="35" fill="#fff"/><image href="${photo(t)}" x="-42" y="-30" width="84" height="60" preserveAspectRatio="xMidYMid slice" clip-path="url(#cl)"/><circle r="35" fill="none" stroke="${line(t)}" stroke-width="5"/></g>`;
+  P.guide=$('#guide');P.trail=$('#trail');P.tok=$('#tok');
+  startLeg();
+  const inp=$('#typer');inp.focus();
+  inp.addEventListener('input',()=>{const v=inp.value.toUpperCase();inp.value='';for(const ch of v)typeChar(ch)});
+}
+function startLeg(){
+  const P=S.play,names=P.legs[P.i];
+  P.idx=0;P.frac=0;
+  const d=pathD(names);P.guide.setAttribute('d',d);P.trail.setAttribute('d',d);
+  P.len=P.trail.getTotalLength();P.trail.style.strokeDasharray=P.len;
+  setFrac(0);
+  $('#legtxt').textContent=`Étape ${P.i+1} sur ${P.legs.length} · ${names[0]} → ${names[names.length-1]}${names.length>2?' par '+names.slice(1,-1).join(', '):''}`;
+  $('#msg').textContent=names.length>2?`On passe par ${names.slice(1,-1).join(' et ')}, là où les lignes rapides se rejoignent.`:'';
+  tiles();
+}
+function setFrac(f){const P=S.play;P.frac=f;const p=P.trail.getPointAtLength(P.len*f);P.tok.setAttribute('transform',`translate(${p.x},${p.y})`);P.trail.style.strokeDashoffset=P.len*(1-f)}
+function tiles(bad){
+  const P=S.play,w=P.t.word;
+  $('#tiles').innerHTML=[...w].map((ch,i)=>`<button class="tile ${i<P.idx?'done':''} ${i===P.idx?'next':''} ${bad&&i===P.idx?'bad':''}" data-ch="${ch}" aria-label="${ch}">${ch}</button>`).join('');
+}
+function tween(to,done){
+  const P=S.play,from=P.frac,ms=matchMedia('(prefers-reduced-motion: reduce)').matches?0:420,t0=performance.now(),id=++anim;
+  (function step(now){if(id!==anim||P!==S.play)return;const k=ms?1:Math.min(1,(now-t0)/ms),e=1-Math.pow(1-k,3);setFrac(from+(to-from)*e);if(k<1)requestAnimationFrame(step);else done&&done()})(t0);
+}
+function typeChar(ch){
+  const P=S.play;if(!P||P.over||!/[A-Z0-9]/.test(ch))return;
+  const w=P.t.word;
+  if(ch===w[P.idx]){P.idx++;tiles();tween(P.idx/w.length,()=>{if(P.idx===w.length)legDone()})}
+  else{tiles(true);$('#msg').textContent=`Ce n'est pas ${ch}. Cherche la lettre ${w[P.idx]}.`}
+}
+function legDone(){
+  const P=S.play,names=P.legs[P.i],city=names[names.length-1];
+  $('#done').insertAdjacentHTML('beforeend',`<path d="${pathD(names)}" fill="none" stroke="${line(P.t)}" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>`);
+  P.i++;
+  if(P.i<P.legs.length){const nx=P.legs[P.i];$('#msg').textContent=`Arrivée à ${city} ! Prochaine étape : ${nx[nx.length-1]}.`;setTimeout(()=>{if(P!==S.play)return;startLeg();$('#msg').textContent=`${city} ! Tape encore ${P.t.word}.`},900)}
+  else finish(city);
+}
+function finish(city){
+  const P=S.play,before=unlockedN();P.over=true;save.trips++;persist();
+  const after=unlockedN(),nt=after>before?TRAINS[after-1]:null;
+  $('#msg').textContent=`Arrivée à ${city}.`;
+  $('#end').innerHTML=`<div class="end"><h2>Bravo !</h2><p>Tu as tapé ${P.t.word} et voyagé : ${S.cities.join(' → ')}.</p>${nt?`<h2 style="font-size:30px">Nouveau train débloqué</h2><img src="${photo(nt)}" alt="${nt.name}"><p><b>${nt.name}</b></p>`:`<p>Tous les trains sont débloqués !</p>`}<div class="acts" style="justify-content:center"><button class="btn" data-act="again">Un autre voyage</button><button class="btn alt" data-train="${nt?nt.id:P.t.id}">${nt?'Voir '+nt.name:'Voir ce train'}</button></div></div>`;
+}
+
+/* ---- jeux : chaque train en propose un deuxième ---- */
+const GAMES={tape:{n:'Tape et roule',ic:'kbd'},memo:{n:'Mémo des trains',ic:'memo'},heure:{n:'Quelle heure ?',ic:'clock'},rail:{n:'Aiguillage',ic:'fork'},bon:{n:'Le bon train',ic:'search'},speed:{n:'Plus ou moins',ic:'gauge'}};
+const OTHER=['memo','heure','rail','bon','speed'];
+function otherGame(t){const i=TRAINS.indexOf(t),o=i+Math.floor(i/5);for(let k=0;k<5;k++){const g=OTHER[(o+k)%5];if(g!=='speed'||t.speed)return g}}
+function otherCard(t,lock){
+  const k=otherGame(t),g=GAMES[k];
+  const attr=k==='speed'?`data-act="speedone" data-id="${t.id}"`:`data-play="${k}" data-id="${t.id}"`;
+  return `<button class="game alt" ${attr} ${lock?'disabled':''}><svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${IC[g.ic]}</svg><b>${g.n}</b></button>`;
+}
+const gwrap=inner=>`<article class="th" style="${th(byId(S.gt).t)}">${inner}</article>`;
+const gend=msg=>`<div class="end"><h2>Bravo !</h2><p>${msg}</p><div class="acts" style="justify-content:center"><button class="btn" data-act="play-again">Rejouer</button><button class="btn alt" data-train="${S.gt}">Voir le train</button></div></div>`;
+function startGame(kind,id){
+  S.gt=id;S.gk=kind;
+  if(kind==='memo')startMemo();else if(kind==='heure')startHeure();else if(kind==='rail')startRail();else if(kind==='bon')startBon();
+  S.v=kind;render();
+}
+function animate(ms,fn,done){
+  const t0=performance.now(),id=++anim,still=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  (function step(now){if(id!==anim)return;const k=still?1:Math.min(1,(now-t0)/ms);fn(1-Math.pow(1-k,2));if(k<1)requestAnimationFrame(step);else done&&done()})(t0);
+}
+
+/* Mémo des trains */
+function startMemo(){
+  const pool=shuffle(TRAINS).slice(0,6);
+  const cards=shuffle(pool.flatMap(t=>[t.id,t.id])).map((id,i)=>({id,i,open:false,done:false}));
+  S.g={cards,first:null,lock:false,moves:0,pairs:0,total:6};
+}
+function memo(){
+  const g=S.g;
+  const cards=g.cards.map(c=>{const t=byId(c.id),up=c.open||c.done;return `<button class="mc ${up?'up':''} ${c.done?'ok':''}" data-card="${c.i}" aria-label="${up?t.name:'Carte cachée'}">${up?`<img src="${photo(t)}" alt="" style="object-position:${t.pos}"><span>${c.done&&unlocked(t)?t.name:''}</span>`:'<b>?</b>'}</button>`}).join('');
+  return gwrap(`<div class="era-tag">Mémo des trains · ${g.moves} ${g.moves>1?'coups':'coup'} · ${g.pairs} sur ${g.total} paires</div><div class="memo">${cards}</div>${g.pairs===g.total?gend(`Tu as trouvé les ${g.total} paires en ${g.moves} coups.`):''}`);
+}
+function memoFlip(i){
+  const g=S.g,c=g.cards[i];
+  if(g.lock||c.open||c.done)return;
+  c.open=true;
+  if(g.first===null){g.first=i;render(true);return}
+  const a=g.cards[g.first];g.moves++;
+  if(a.id===c.id){a.done=c.done=true;a.open=c.open=false;g.pairs++;g.first=null;render(true)}
+  else{g.lock=true;render(true);setTimeout(()=>{a.open=c.open=false;g.first=null;g.lock=false;if(S.v==='memo'&&S.g===g)render(true)},900)}
+}
+
+/* Quelle heure ? */
+const fmt=(h,m)=>String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');
+const pick1=a=>a[Math.floor(Math.random()*a.length)];
+function heureQ(r){
+  const sets=[[0],[30],[15,45],[0,15,30,45],[5,10,20,25,35,40,50,55]];
+  const m=pick1(sets[r]),h=1+Math.floor(Math.random()*12),good=fmt(h,m);
+  const wr=[fmt(m/5||12,(h*5)%60),fmt(h%12+1,m),fmt(h,(m+30)%60),fmt(1+Math.floor(Math.random()*12),pick1([0,15,30,45]))].filter((x,i,a)=>x!==good&&a.indexOf(x)===i).slice(0,2);
+  return{h,m,good,opts:shuffle([good,...wr])};
+}
+function startHeure(){S.g={r:0,score:0,phase:'ask',pick:null};S.g.q=heureQ(0)}
+function clockSVG(h,m){
+  const pt=(deg,len)=>[150+len*Math.sin(deg*Math.PI/180),150-len*Math.cos(deg*Math.PI/180)];
+  const hh=pt((h%12)*30+m*.5,62),mm=pt(m*6,96);
+  const nums=[...Array(12)].map((_,i)=>{const p=pt((i+1)*30,108);return `<text x="${p[0].toFixed(1)}" y="${(p[1]+9).toFixed(1)}" text-anchor="middle" font-size="26" font-weight="700" fill="#23262B" style="font-family:var(--t-font)">${i+1}</text>`}).join('');
+  return `<svg viewBox="0 0 300 300" width="360" height="360" role="img" aria-label="Une horloge"><circle cx="150" cy="150" r="142" fill="#fff" stroke="#23262B" stroke-width="5"/>${nums}<line x1="150" y1="150" x2="${hh[0].toFixed(1)}" y2="${hh[1].toFixed(1)}" stroke="#23262B" stroke-width="10" stroke-linecap="round"/><line x1="150" y1="150" x2="${mm[0].toFixed(1)}" y2="${mm[1].toFixed(1)}" stroke="#C8282D" stroke-width="6" stroke-linecap="round"/><circle cx="150" cy="150" r="9" fill="#C8282D"/></svg>`;
+}
+function heure(){
+  const g=S.g,q=g.q,over=g.phase==='win'||g.phase==='lose';
+  if(g.phase==='end')return gwrap(gend(`Score : ${g.score} sur 5.`));
+  return gwrap(`<div class="era-tag">Quelle heure ? · Question ${g.r+1} sur 5 · Score ${g.score}</div><div class="tp"><div class="mapcard" style="display:flex;justify-content:center">${clockSVG(q.h,q.m)}</div><div><h1 style="font-size:clamp(30px,4.4vw,52px)">À quelle heure part ce train ?</h1><div class="opts">${q.opts.map(o=>`<button class="opt ${over&&o===q.good?'good':''} ${over&&o===g.pick&&o!==q.good?'bad':''}" data-ans="${o}" ${over?'disabled':''}>${o}</button>`).join('')}</div><div class="hint" aria-live="polite">${g.phase==='win'?'Bravo !':g.phase==='lose'?`C'était ${q.good}.`:''}</div>${over?`<div class="acts"><button class="btn" data-act="hnext">${g.r===4?'Voir mon score':'Suivant ▸'}</button></div>`:''}</div></div>`);
+}
+function heureAns(v){const g=S.g;if(g.phase!=='ask')return;g.pick=v;if(v===g.q.good){g.phase='win';g.score++}else g.phase='lose';render(true)}
+function heureNext(){const g=S.g;if(g.r>=4)g.phase='end';else{g.r++;g.q=heureQ(g.r);g.phase='ask';g.pick=null}render()}
+
+/* Aiguillage */
+function startRail(){S.g={lv:0,score:0};railLevel()}
+function railLevel(){
+  const g=S.g,D=g.lv+1,L=1<<D;
+  g.D=D;g.names=shuffle(Object.keys(CITY)).slice(0,L);g.sw={};
+  for(let d=0;d<D;d++)for(let i=0;i<1<<d;i++)g.sw[d+'-'+i]=Math.floor(Math.random()*2);
+  g.target=pick1(g.names);g.att=0;g.phase='set';g.run=false;g.msg='';
+}
+function railGeo(D){
+  const L=1<<D,x0=50,x1=500,pos={},ly=i=>34+(i+.5)*(292/L);
+  for(let d=0;d<=D;d++){const n=1<<d,span=L/n;for(let i=0;i<n;i++)pos[d+'-'+i]=[x0+d*(x1-x0)/D,(ly(i*span)+ly(i*span+span-1))/2]}
+  return pos;
+}
+const seg=(a,b)=>`C${(a[0]+b[0])/2},${a[1]} ${(a[0]+b[0])/2},${b[1]} ${b[0]},${b[1]}`;
+function railRoute(g){
+  const pos=railGeo(g.D);let i=0,d=`M${pos['0-0'][0]-44},${pos['0-0'][1]} L${pos['0-0'].join(',')}`;
+  for(let k=0;k<g.D;k++){const c=2*i+g.sw[k+'-'+i];d+=' '+seg(pos[k+'-'+i],pos[(k+1)+'-'+c]);i=c}
+  return{d,leaf:i};
+}
+function railSVG(g,t){
+  const pos=railGeo(g.D),acc=line(t),rt=railRoute(g);let tr='',sw='',lv='';
+  for(let d=0;d<g.D;d++)for(let i=0;i<1<<d;i++){
+    const a=pos[d+'-'+i],open=g.sw[d+'-'+i];
+    for(let c=0;c<2;c++){const b=pos[(d+1)+'-'+(2*i+c)],p=`M${a[0]},${a[1]} ${seg(a,b)}`;
+      tr+=c===open?`<path d="${p}" fill="none" stroke="#2A2420" stroke-width="9"/><path d="${p}" fill="none" stroke="#EFE9DA" stroke-width="9" stroke-dasharray="2 10"/>`:`<path d="${p}" fill="none" stroke="#2A2420" stroke-opacity=".28" stroke-width="5"/>`}
+    const b=pos[(d+1)+'-'+(2*i+open)],ang=Math.atan2(b[1]-a[1],b[0]-a[0]);
+    sw+=`<g data-sw="${d}-${i}" role="button" tabindex="0" aria-label="Aiguillage : touche pour changer de voie" style="cursor:pointer"><circle cx="${a[0]}" cy="${a[1]}" r="18" fill="${acc}" stroke="#fff" stroke-width="4"/><path d="M${a[0]},${a[1]} l${(11*Math.cos(ang)).toFixed(1)},${(11*Math.sin(ang)).toFixed(1)}" stroke="#fff" stroke-width="5" stroke-linecap="round"/></g>`;
+  }
+  g.names.forEach((n,i)=>{const p=pos[g.D+'-'+i],tg=n===g.target;lv+=`<circle cx="${p[0]}" cy="${p[1]}" r="${tg?11:7}" fill="${tg?acc:'#9aa0a6'}" stroke="#fff" stroke-width="3"/><text x="${p[0]+18}" y="${p[1]+6}" font-size="19" font-weight="700" fill="#23262B" font-family="Lato,sans-serif">${tg?'★ ':''}${n}</text>`});
+  const s=[pos['0-0'][0]-44,pos['0-0'][1]];
+  return `<svg viewBox="0 0 640 360" role="img" aria-label="Un réseau de voies avec des aiguillages">${tr}<path d="M${s[0]},${s[1]} L${pos['0-0'].join(',')}" fill="none" stroke="#2A2420" stroke-width="9"/><path id="rp" d="${rt.d}" fill="none" stroke="none"/>${lv}${sw}<text x="${s[0]-24}" y="${s[1]-36}" font-size="16" font-weight="700" fill="#23262B" font-family="Lato,sans-serif">Départ</text><g id="rt" transform="translate(${s[0]},${s[1]})"><clipPath id="rc"><circle r="26"/></clipPath><circle r="31" fill="#fff"/><image href="${photo(t)}" x="-38" y="-27" width="76" height="54" preserveAspectRatio="xMidYMid slice" clip-path="url(#rc)"/><circle r="31" fill="none" stroke="${acc}" stroke-width="5"/></g></svg>`;
+}
+function rail(){
+  const g=S.g,t=byId(S.gt);
+  if(g.phase==='end')return gwrap(gend(`Score : ${g.score} sur 9.`));
+  const msg=g.phase==='win'?'Bravo, le train est arrivé !':g.phase==='miss'?`Oups, le train est allé à ${g.names[railRoute(g).leaf]}.`:g.msg||'Touche un rond pour changer de voie.';
+  const btn=g.phase==='set'?`<button class="btn" data-act="rail-go" ${g.run?'disabled':''}>Départ ▸</button>`:g.phase==='miss'?`<button class="btn" data-act="rail-retry">Réessayer</button>`:`<button class="btn" data-act="rail-next">${g.lv===2?'Voir mon score':'Niveau suivant ▸'}</button>`;
+  return gwrap(`<div class="era-tag">Aiguillage · Niveau ${g.lv+1} sur 3 · Score ${g.score}</div><div class="setup"><div class="mapcard">${railSVG(g,t)}</div><div><h1 style="font-size:clamp(30px,4.4vw,52px)">Mène le train à ${g.target} !</h1><div class="banner" style="text-align:left;min-height:56px" aria-live="polite">${msg}</div><div class="acts">${btn}</div></div></div>`);
+}
+function railToggle(k){const g=S.g;if(!g||g.run||g.phase!=='set')return;g.sw[k]^=1;render(true)}
+function railGo(){
+  const g=S.g;if(g.run||g.phase!=='set')return;
+  g.run=true;const p=$('#rp'),tok=$('#rt'),L=p.getTotalLength(),leaf=railRoute(g).leaf;
+  animate(2400,k=>{const q=p.getPointAtLength(L*k);tok.setAttribute('transform',`translate(${q.x},${q.y})`)},()=>{
+    g.run=false;
+    if(g.names[leaf]===g.target){g.score+=Math.max(1,3-g.att);g.phase='win'}else{g.phase='miss';g.att++}
+    if(S.v==='rail'&&S.g===g)render(true);
+  });
+}
+function railNext(){const g=S.g;if(g.lv>=2)g.phase='end';else{g.lv++;railLevel()}render()}
+
+/* Le bon train */
+function bonQ(last){
+  const pool=TRAINS.filter(unlocked);let t;
+  do{t=pick1(pool)}while(pool.length>1&&t.id===last);
+  const others=shuffle(TRAINS.filter(x=>x!==t)).slice(0,2);
+  return{t,pos:`${15+Math.random()*70}% ${25+Math.random()*50}%`,opts:shuffle([t,...others])};
+}
+function startBon(){S.g={r:0,score:0,phase:'zoom',pick:null};S.g.q=bonQ(null)}
+function bon(){
+  const g=S.g,q=g.q,over=g.phase==='win'||g.phase==='lose';
+  if(g.phase==='end')return gwrap(gend(`Score : ${g.score} sur 10.`));
+  const zoom=g.phase==='zoom';
+  return gwrap(`<div class="era-tag">Le bon train · Question ${g.r+1} sur 5 · Score ${g.score}</div><div class="tp"><div class="zoomimg" role="img" aria-label="Un détail d'une photo de train" style="background-image:url(${photo(q.t)});background-size:${zoom?'280%':'cover'};background-position:${zoom?q.pos:q.t.pos}"></div><div><h1 style="font-size:clamp(30px,4.4vw,52px)">Quel est ce train ?</h1><div class="opts">${q.opts.map(o=>`<button class="opt ${over&&o===q.t?'good':''} ${over&&g.pick===o.id&&o!==q.t?'bad':''}" data-bon="${o.id}" ${over?'disabled':''}>${o.name}</button>`).join('')}</div><div class="acts">${zoom?`<button class="btn alt" data-act="bon-wide">Voir toute la photo</button>`:''}${over?`<button class="btn" data-act="bon-next">${g.r===4?'Voir mon score':'Suivant ▸'}</button>`:''}</div></div></div>`);
+}
+function bonAns(id){
+  const g=S.g;if(g.phase!=='zoom'&&g.phase!=='wide')return;
+  const ok=id===g.q.t.id;g.pick=id;if(ok)g.score+=g.phase==='zoom'?2:1;g.phase=ok?'win':'lose';render(true);
+}
+function bonNext(){const g=S.g;if(g.r>=4)g.phase='end';else{g.r++;g.q=bonQ(g.q.t.id);g.phase='zoom';g.pick=null}render()}
+
+document.addEventListener('click',e=>{
+  const sw=e.target.closest('[data-sw]');if(sw){railToggle(sw.dataset.sw);return}
+  const b=e.target.closest('button');if(!b||b.disabled)return;
+  const d=b.dataset;
+  if(d.ch){const i=$('#typer');if(i)i.focus();typeChar(d.ch);return}
+  if(d.card!==undefined){memoFlip(+d.card);return}
+  if(d.ans){heureAns(d.ans);return}
+  if(d.bon){bonAns(d.bon);return}
+  if(d.play){startGame(d.play,d.id);return}
+  if(d.step){setGv(S.sg.gv+Number(d.step));return}
+  if(d.go){if(d.go==='speed')S.sg=null;S.v=d.go;render()}
+  else if(d.train){S.id=d.train;S.v='train';render()}
+  else if(d.pick){S.pick=d.pick;S.v='journey';render()}
+  else if(d.chose){S.pick=d.chose;render()}
+  else if(d.city){const c=S.cities,i=c.indexOf(d.city);if(i>=0)c.splice(i,1);else if(c.length<3)c.push(d.city);render(true)}
+  
+  else if(d.act==='cred'){const p=b.nextElementSibling;p.hidden=!p.hidden;b.setAttribute('aria-expanded',String(!p.hidden))}
+  else if(d.act==='again'){S.cities=[];render()}
+  else if(d.act==='hnext')heureNext();
+  else if(d.act==='rail-go')railGo();
+  else if(d.act==='rail-retry'){S.g.phase='set';render(true)}
+  else if(d.act==='rail-next')railNext();
+  else if(d.act==='bon-wide'){S.g.phase='wide';render(true)}
+  else if(d.act==='bon-next')bonNext();
+  else if(d.act==='play-again')startGame(S.gk,S.gt);
+  else if(d.act==='speedstart')startSpeed();
+  else if(d.act==='speedone')startSpeed(d.id);
+  else if(d.act==='guess')guess();
+  else if(d.act==='next')nextSpeed();
+  else if(d.act==='reset'){S.confirm=true;render(true)}
+  else if(d.act==='reset-no'){S.confirm=false;render(true)}
+  else if(d.act==='reset-yes'){save={seen:[],trips:0};persist();S.confirm=false;S.v='album';render()}
+});
+document.addEventListener('keydown',e=>{
+  if((e.key==='Enter'||e.key===' ')&&e.target.dataset&&e.target.dataset.sw){e.preventDefault();railToggle(e.target.dataset.sw);return}
+  if(S.v!=='journey'||!S.play||e.ctrlKey||e.metaKey||e.altKey||e.key.length!==1)return;
+  const i=$('#typer');if(document.activeElement!==i){e.preventDefault();i.focus();typeChar(e.key.toUpperCase())}
+});
+render();
+</script>
+</body>
+</html>
