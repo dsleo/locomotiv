@@ -186,7 +186,8 @@ h1,h2,h3{margin:0;text-wrap:balance;font-weight:400}
 .dbg button{border:0;border-radius:999px;background:#fff;color:#111;padding:8px 14px;font:700 13px var(--body);min-height:36px}
 .back{display:inline-flex;align-items:center;min-height:44px;margin-bottom:6px;font:700 14px var(--body);letter-spacing:.04em;color:var(--t-ink);text-decoration:none}
 .back:hover{text-decoration:underline}
-.yts{display:flex;flex-direction:column;gap:8px}
+.yts{display:flex;flex-direction:column;gap:8px;margin-top:22px}
+.ytx{display:block;margin-top:8px;padding:6px 12px;border:0;border-radius:var(--t-btn);background:var(--t-panel);color:var(--t-pi);font:700 13px var(--body);box-shadow:var(--t-sh)}
 .ytb{display:flex;align-items:center;gap:12px;width:100%;min-height:52px;padding:8px 14px;border:0;border-radius:var(--t-btn);background:var(--t-panel);color:var(--t-pi);text-align:left;font:700 15px/1.25 var(--body);box-shadow:var(--t-sh)}
 .ytp{flex:none;width:34px;height:34px;border-radius:50%;background:var(--t-acc);color:var(--t-on);display:flex;align-items:center;justify-content:center;font-size:13px}
 .yt iframe{display:block;width:100%;aspect-ratio:16/9;border:0;border-radius:var(--t-r);background:#000}
@@ -251,10 +252,14 @@ ouigo:[['MfLUXBwrsKw','À bord du nouveau Ouigo'],['RiMbqA5duYE','Ouigo Duplex :
 inoui:[['PTOfHs4eDdA','Bienvenue à bord du futur TGV inOui'],['fk58dOLrBS0','Cabride en TGV inOui à 320 km/h']],
 jaune:[['MwaIZ2vsZkE','À bord du Train Jaune'],['GtWlJJylUsg','Le train jaune de Cerdagne']]
 };
+const ytBtn=(id,ti)=>`<button class="ytb" data-yt="${id}"><span class="ytp" aria-hidden="true">▶</span>${ti}</button>`;
 function ytPlay(b,id){
   const box=b.closest('.yt');
-  box.innerHTML=`<iframe src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0" title="Vidéo YouTube" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
+  box.parentNode.querySelectorAll('.yt[data-id]').forEach(x=>ytClose(x)); // une seule vidéo à la fois
+  box.dataset.id=id;box.dataset.ti=b.textContent.replace(/^▶/,'');
+  box.innerHTML=`<iframe src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0" title="Vidéo YouTube" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe><button class="ytx" data-ytx="1">▲ Replier la vidéo</button>`;
 }
+function ytClose(box){box.innerHTML=ytBtn(box.dataset.id,box.dataset.ti);delete box.dataset.id;delete box.dataset.ti}
 const ERAS=[[1,'Les grands trains','1950 – 1975','#A3202E'],[2,'Corail et orange','1975 – 1988','#E8681C'],[3,'Argent et bleu','1989 – 2003','#1F3AA8'],[4,'Le TER partout','2004 – 2017','#1E7A4E'],[5,'Ouigo et inOui','2013 →','#00B6E3'],[6,'Toujours là','1910 →','#F2B705']];
 /* icônes des fiches : une par type d'information */
 const IC={
@@ -349,7 +354,7 @@ function trainPage(){
   const t=byId(S.id),lock=!unlocked(t);
   const era=ERAS.find(e=>e[0]===t.era);
   if(!lock&&!save.seen.includes(t.id)){save.seen.push(t.id);persist()}
-  return `<article class="th" style="${th(t.t)}"><div class="era-tag">${era[1]} · ${t.yrs}</div><div class="tp"><div><div class="phw"><figure class="frame"><img src="${photo(t)}" alt="${t.name}" style="object-position:${t.pos};${lock?'filter:grayscale(1) blur(6px)':''}"></figure>${credBtn(t)}</div>${t.video&&!lock?`<div class="phw vid"><video controls playsinline preload="metadata" poster="${photo(t)}" src="videos/${t.video.f}.mp4" aria-label="Vidéo : ${t.name}"></video>${credBtn(t.video,'Vidéo')}</div>`:''}${YT[t.id]&&!lock?`<div class="yts">${YT[t.id].map(([id,ti])=>`<div class="yt"><button class="ytb" data-yt="${id}"><span class="ytp" aria-hidden="true">▶</span>${ti}</button></div>`).join('')}</div>`:''}</div>
+  return `<article class="th" style="${th(t.t)}"><div class="era-tag">${era[1]} · ${t.yrs}</div><div class="tp"><div><div class="phw"><figure class="frame"><img src="${photo(t)}" alt="${t.name}" style="object-position:${t.pos};${lock?'filter:grayscale(1) blur(6px)':''}"></figure>${credBtn(t)}</div>${t.video&&!lock?`<div class="phw vid"><video controls playsinline preload="metadata" poster="${photo(t)}" src="videos/${t.video.f}.mp4" aria-label="Vidéo : ${t.name}"></video>${credBtn(t.video,'Vidéo')}</div>`:''}${YT[t.id]&&!lock?`<div class="yts">${YT[t.id].map(([id,ti])=>`<div class="yt">${ytBtn(id,ti)}</div>`).join('')}</div>`:''}</div>
   <div><h1>${t.name}</h1><div class="sub">${t.sub}</div>${lock?`<div class="stats"><div class="stat" style="grid-column:1/-1"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><b>Verrouillé</b><span>Réussis « Tape et roule » avec le train d'avant pour débloquer celui-ci.</span></div></div>`:`<div class="stats">${t.stats.map((s,i)=>{const gi=t.stats.findIndex(x=>icoKey(x[0],x[1])==='gauge'),hide=(save.pend[t.id]==='speed'&&i===gi)||(save.pend[t.id]==='cap'&&i===t.ci);return `<div class="stat">${ico(s[0],s[1])}<b>${hide?'?':s[0]}</b><span>${s[1]}</span></div>`}).join('')}</div><p class="blurb">${t.blurb}</p>`}
   <div class="games" style="margin-top:22px"><button class="game" data-pick="${t.id}" ${lock?'disabled':''}><svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${IC.kbd}</svg><b>Tape et roule</b></button>${debug?allOther(t).map(k=>otherCard(t,lock,k)).join(''):otherCard(t,lock)}</div></div></div></div>
   </article>`;
@@ -636,6 +641,7 @@ document.addEventListener('click',e=>{
   const d=b.dataset;
   if(d.ch){const i=$('#typer');if(i)i.focus();typeChar(d.ch);return}
   if(d.yt){ytPlay(b,d.yt);return}
+  if(d.ytx){ytClose(b.closest('.yt'));return}
   if(d.card!==undefined){memoFlip(+d.card);return}
   if(d.ans){heureAns(d.ans);return}
   if(d.play){go('#/jeu/'+d.play+'/'+d.id);return}
