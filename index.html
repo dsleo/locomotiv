@@ -80,9 +80,6 @@ h1,h2,h3{margin:0;text-wrap:balance;font-weight:400}
 .setup{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px;align-items:start}
 .mapcard{background:var(--t-panel);border-radius:var(--t-r);padding:12px;box-shadow:var(--t-sh)}
 .mapcard svg{display:block;width:100%;height:auto;max-height:70vh}
-.pills{display:flex;flex-wrap:wrap;gap:8px}
-.pill{min-height:44px;padding:0 16px;border:2px solid var(--t-ink);background:transparent;color:var(--t-ink);border-radius:var(--t-btn);font-family:var(--t-font);font-size:17px}
-.pill[aria-pressed="true"]{background:var(--t-acc);color:var(--t-on);border-color:var(--t-acc)}
 .picker{display:flex;gap:10px;overflow-x:auto;padding:6px 2px 10px}
 .pick{flex:0 0 92px;border:3px solid transparent;background:var(--t-panel);color:var(--t-pi);border-radius:var(--t-r);padding:0;overflow:hidden;text-align:center;font-family:var(--body);font-size:12px;font-weight:700}
 .pick img{display:block;width:100%;aspect-ratio:1;object-fit:cover}
@@ -207,6 +204,8 @@ h1,h2,h3{margin:0;text-wrap:balance;font-weight:400}
 const LAND="M487,219 L480,223 L482,227 L480,231 L472,241 L468,247 L462,253 L459,261 L449,271 L448,280 L447,289 L443,294 L453,291 L455,283 L462,281 L475,281 L476,289 L478,297 L482,302 L482,309 L475,313 L480,322 L482,329 L489,335 L487,342 L480,348 L473,349 L469,354 L473,359 L480,365 L484,373 L480,377 L477,384 L478,390 L482,398 L488,402 L496,407 L504,405 L510,409 L505,416 L502,425 L496,429 L490,433 L485,438 L480,442 L476,446 L470,450 L470,453 L467,458 L458,464 L450,464 L445,464 L439,465 L434,461 L428,459 L419,456 L416,450 L405,446 L400,450 L389,447 L382,444 L370,438 L357,446 L346,453 L333,465 L331,484 L334,495 L334,500 L327,498 L320,501 L312,505 L305,502 L296,501 L290,501 L285,498 L283,492 L276,489 L271,490 L267,485 L259,485 L250,480 L240,478 L237,486 L229,484 L223,484 L216,485 L206,479 L199,479 L193,481 L187,475 L181,471 L170,467 L165,464 L159,464 L162,455 L155,455 L148,450 L156,441 L162,418 L168,381 L174,377 L170,371 L168,366 L171,332 L177,330 L186,344 L190,352 L186,335 L176,324 L167,314 L173,309 L174,300 L169,294 L172,288 L166,285 L158,280 L146,275 L136,259 L139,245 L130,240 L132,232 L123,231 L118,226 L119,220 L115,217 L106,219 L107,216 L110,212 L102,215 L97,220 L93,212 L94,206 L87,208 L80,203 L80,202 L71,203 L63,198 L55,199 L48,203 L45,192 L35,190 L42,186 L51,184 L48,180 L41,178 L41,173 L46,175 L54,175 L45,172 L41,171 L33,171 L32,163 L39,159 L46,155 L55,153 L63,151 L68,155 L74,153 L79,151 L82,146 L91,144 L98,146 L102,151 L107,158 L112,162 L121,155 L126,157 L132,158 L137,158 L138,158 L143,153 L151,157 L158,153 L154,145 L155,136 L153,123 L146,115 L144,105 L141,97 L147,98 L158,99 L166,98 L165,106 L172,116 L187,117 L201,118 L219,114 L225,111 L218,108 L224,96 L237,89 L250,86 L268,77 L279,71 L274,65 L274,58 L275,45 L278,32 L287,26 L299,23 L313,21 L315,33 L324,40 L332,37 L339,42 L340,51 L349,53 L355,60 L363,62 L372,65 L373,73 L373,79 L379,82 L390,81 L399,71 L399,78 L400,84 L404,91 L412,97 L418,102 L424,108 L433,106 L440,108 L449,110 L460,110 L466,117 L471,124 L477,126 L481,124 L488,129 L496,128 L502,130 L510,133 L519,133 L529,138 L521,149 L513,158 L510,171 L505,183 L506,193 L503,206 L502,217 L499,220 L490,223Z M574,532 L574,537 L573,544 L570,547 L573,547 L570,549 L569,552 L570,553 L567,557 L565,559 L562,558 L560,554 L555,552 L553,549 L550,547 L551,545 L555,542 L551,540 L548,540 L548,535 L551,532 L549,529 L545,529 L544,526 L547,523 L549,521 L546,518 L542,516 L543,513 L544,510 L547,509 L544,505 L542,505 L544,501 L546,498 L548,493 L551,493 L554,489 L559,489 L562,485 L566,484 L570,487 L572,482 L571,474 L572,468 L576,470 L577,476 L576,487 L579,495 L580,513 L576,524 L574,532Z";
 const CITY={Paris:[305,144],Lyon:[400,316],Bordeaux:[193,367],Marseille:[420,452],Lille:[332,45],Strasbourg:[511,159],Nantes:[156,235],Rennes:[151,185],Toulouse:[270,435],Nice:[493,430]};
 // L = ligne à grande vitesse, C = ligne classique. Les poids favorisent L : Lyon–Bordeaux passe alors par Paris.
+// Trois villes par train (dans l'ordre du voyage)
+const TRIP={picasso:['Rennes','Nantes','Paris'],cc6500:['Paris','Lyon','Marseille'],capitole:['Paris','Bordeaux','Toulouse'],caravelle:['Toulouse','Marseille','Nice'],corail:['Paris','Lille','Strasbourg'],sudest:['Paris','Lyon','Marseille'],poste:['Lille','Paris','Lyon'],z5600:['Paris','Rennes','Nantes'],atlantique:['Paris','Nantes','Bordeaux'],duplex:['Lille','Paris','Marseille'],teoz:['Paris','Toulouse','Marseille'],ater:['Nantes','Rennes','Paris'],agc:['Toulouse','Bordeaux','Paris'],ter2n:['Strasbourg','Paris','Lille'],regio2n:['Lyon','Marseille','Nice'],regiolis:['Bordeaux','Toulouse','Marseille'],ouigo:['Strasbourg','Paris','Lyon'],inoui:['Lille','Paris','Bordeaux'],jaune:['Marseille','Toulouse','Bordeaux']};
 const EDGES=[['Paris','Lille','L'],['Paris','Strasbourg','L'],['Paris','Rennes','L'],['Paris','Nantes','L'],['Paris','Bordeaux','L'],['Paris','Lyon','L'],['Lyon','Marseille','L'],['Marseille','Nice','C'],['Marseille','Toulouse','C'],['Toulouse','Bordeaux','C'],['Rennes','Nantes','C']];
 const SH={hard:'6px 6px 0 rgba(0,0,0,.35)',soft:'0 14px 30px -12px rgba(0,0,0,.45)',none:'none'};
 // thème : fond, texte sur fond, panneau, texte sur panneau, accent, texte sur accent, police, rayon, rayon des boutons, ombre
@@ -315,7 +314,7 @@ const debug=/[?&]debug\b/.test(location.search);
 try{localStorage.removeItem('carnet-debug')}catch(e){}
 const unlockedN=()=>debug?TRAINS.length:Math.min(TRAINS.length,1+save.trips);
 const unlocked=t=>TRAINS.indexOf(t)<unlockedN();
-const S={v:'home',id:'picasso',cities:['Paris','Lyon','Bordeaux'],pick:'picasso',play:null,sg:null,confirm:false,gt:'picasso',gk:null,g:null,other:null};
+const S={v:'home',id:'picasso',pick:'picasso',play:null,sg:null,confirm:false,gt:'picasso',gk:null,g:null,other:null};
 
 function route(a,b){
   const w=(x,y,k)=>Math.hypot(CITY[x][0]-CITY[y][0],CITY[x][1]-CITY[y][1])*(k==='L'?0.6:1.4);
@@ -362,14 +361,13 @@ function trainPage(){
   </article>`;
 }
 function journey(){
-  const t=byId(S.pick),c=S.cities,ready=c.length===3,left=3-c.length;
-  let legs=[];
-  if(ready){for(let i=0;i<2;i++)legs.push(route(c[i],c[i+1]));S.play={t,legs,i:0,idx:0,over:false}}else S.play=null;
+  const t=byId(S.pick),c=TRIP[t.id],legs=[0,1].map(i=>route(c[i],c[i+1]));
+  S.play={t,legs,cities:c,i:0,idx:0,over:false};
   return `<article class="th" style="${th(t.t)}">${back(t)}<div class="era-tag" id="legtxt">Tape et roule · ${t.name}</div><div class="setup"><div class="mapcard">${mapSVG({sel:c,acc:line(t),land:'#fff',ink:'#23262B',stroke:'#9aa0a6'})}</div>
-  <div><h1 style="font-size:clamp(32px,4.6vw,56px)">${ready?'On part !':'Choisis 3 villes'}</h1><div class="pills" style="margin:16px 0" role="group" aria-label="Villes">${Object.keys(CITY).map(n=>`<button class="pill" data-city="${n}" aria-pressed="${c.includes(n)}">${n}</button>`).join('')}</div>
-  <div class="banner" id="msg" aria-live="polite" style="text-align:left;min-height:56px">${ready?'':`Choisis encore ${left} ${left>1?'villes':'ville'}, puis tape « ${t.word} » pour faire avancer le train.`}</div>
-  <div class="tiles" id="tiles" aria-label="Lettres à taper">${ready?'':[...t.word].map(ch=>`<span class="tile">${ch}</span>`).join('')}</div>
-  <input id="typer" type="text" inputmode="text" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Tape le nom du train" ${ready?'':'disabled'} placeholder="${ready?`Tape ${t.word} ici`:'Choisis d\'abord 3 villes'}"><div id="end"></div></div></div></article>`;
+  <div><h1 style="font-size:clamp(32px,4.6vw,56px)">On part !</h1><div class="small" style="margin:12px 0">${c.join(' → ')}</div>
+  <div class="banner" id="msg" aria-live="polite" style="text-align:left;min-height:28px"></div>
+  <div class="tiles" id="tiles" aria-label="Lettres à taper"></div>
+  <input id="typer" type="text" inputmode="text" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Tape le nom du train" placeholder="Tape ${t.word} ici"><div id="end"></div></div></div></article>`;
 }
 /* ---- Devine la vitesse ---- */
 const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
@@ -433,6 +431,15 @@ function render(keep){
   if(!keep)window.scrollTo(0,0);
 }
 
+/* ---- Voix : survole une lettre ou une heure pour l'entendre ---- */
+const LETTRE={A:'a',B:'bé',C:'cé',D:'dé',E:'eu',F:'effe',G:'gé',H:'hache',I:'i',J:'ji',K:'ka',L:'elle',M:'emme',N:'enne',O:'o',P:'pé',Q:'ku',R:'erre',S:'esse',T:'té',U:'u',V:'vé',W:'double vé',X:'ixe',Y:'i grec',Z:'zède'};
+const heureDite=o=>{const [h,m]=o.split(':').map(Number);return `${h} heure${h>1?'s':''}${m?' '+m:''}`};
+let said=null;
+function say(txt){
+  try{const u=new SpeechSynthesisUtterance(txt);u.lang='fr-FR';const v=speechSynthesis.getVoices().find(x=>/^fr/i.test(x.lang));if(v)u.voice=v;u.rate=.85;speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){}
+}
+document.addEventListener('mouseover',e=>{const el=e.target.closest('[data-say]');if(el&&el!==said&&!el.disabled){said=el;say(el.dataset.say)}});
+document.addEventListener('mouseout',e=>{if(said&&!said.contains(e.relatedTarget))said=null});
 /* ---- Voyage : taper le nom du train ---- */
 let anim=0;
 function initPlay(){
@@ -457,7 +464,7 @@ function startLeg(){
 function setFrac(f){const P=S.play;P.frac=f;const p=P.trail.getPointAtLength(P.len*f);P.tok.setAttribute('transform',`translate(${p.x},${p.y})`);P.trail.style.strokeDashoffset=P.len*(1-f)}
 function tiles(bad){
   const P=S.play,w=P.t.word;
-  $('#tiles').innerHTML=[...w].map((ch,i)=>`<button class="tile ${i<P.idx?'done':''} ${i===P.idx?'next':''} ${bad&&i===P.idx?'bad':''}" data-ch="${ch}" aria-label="${ch}">${ch}</button>`).join('');
+  $('#tiles').innerHTML=[...w].map((ch,i)=>`<button class="tile ${i<P.idx?'done':''} ${i===P.idx?'next':''} ${bad&&i===P.idx?'bad':''}" data-ch="${ch}" data-say="${LETTRE[ch]||ch}" aria-label="${ch}">${ch}</button>`).join('');
 }
 function tween(to,done){
   const P=S.play,from=P.frac,ms=matchMedia('(prefers-reduced-motion: reduce)').matches?0:420,t0=performance.now(),id=++anim;
@@ -479,7 +486,7 @@ function legDone(){
 function finish(city){
   const P=S.play;P.over=true;const nt=reward();
   $('#msg').textContent=`Arrivée à ${city}.`;unlockPop(nt);
-  $('#end').innerHTML=`<div class="end"><h2>Bravo !</h2><p>Tu as tapé ${P.t.word} et voyagé : ${S.cities.join(' → ')}.</p>${nt?'':`<p>Tous les trains sont débloqués !</p>`}<div class="acts" style="justify-content:center"><button class="btn" data-act="again">Un autre voyage</button><button class="btn alt" data-train="${nt?nt.id:P.t.id}">${nt?'Voir '+nt.name:'Voir ce train'}</button></div></div>`;
+  $('#end').innerHTML=`<div class="end"><h2>Bravo !</h2><p>Tu as tapé ${P.t.word} et voyagé : ${P.cities.join(' → ')}.</p>${nt?'':`<p>Tous les trains sont débloqués !</p>`}<div class="acts" style="justify-content:center"><button class="btn" data-act="again">Un autre voyage</button><button class="btn alt" data-train="${nt?nt.id:P.t.id}">${nt?'Voir '+nt.name:'Voir ce train'}</button></div></div>`;
 }
 
 /* ---- jeux : chaque train en propose un deuxième ---- */
@@ -562,7 +569,7 @@ function clockSVG(h,m){
 function heure(){
   const g=S.g,q=g.q,over=g.phase==='win'||g.phase==='lose';
   if(g.phase==='end')return gwrap(gend(`Score : ${g.score} sur 5.${g.score>=3?'':' Il faut 3 bonnes réponses pour débloquer le train suivant.'}`,g.score>=3,g.nt));
-  return gwrap(`<div class="era-tag">Quelle heure ? · Question ${g.r+1} sur 5 · Score ${g.score}</div><div class="tp"><div class="mapcard" style="display:flex;justify-content:center">${clockSVG(q.h,q.m)}</div><div><h1 style="font-size:clamp(30px,4.4vw,52px)">À quelle heure part ce train ?</h1><div class="opts">${q.opts.map(o=>`<button class="opt ${over&&o===q.good?'good':''} ${over&&o===g.pick&&o!==q.good?'bad':''}" data-ans="${o}" ${over?'disabled':''}>${o}</button>`).join('')}</div><div class="hint" aria-live="polite">${g.phase==='win'?'Bravo !':g.phase==='lose'?`C'était ${q.good}.`:''}</div>${over?`<div class="acts"><button class="btn" data-act="hnext">${g.r===4?'Voir mon score':'Suivant ▸'}</button></div>`:''}</div></div>`);
+  return gwrap(`<div class="era-tag">Quelle heure ? · Question ${g.r+1} sur 5 · Score ${g.score}</div><div class="tp"><div class="mapcard" style="display:flex;justify-content:center">${clockSVG(q.h,q.m)}</div><div><h1 style="font-size:clamp(30px,4.4vw,52px)">À quelle heure part ce train ?</h1><div class="opts">${q.opts.map(o=>`<button class="opt ${over&&o===q.good?'good':''} ${over&&o===g.pick&&o!==q.good?'bad':''}" data-ans="${o}" data-say="${heureDite(o)}" ${over?'disabled':''}>${o}</button>`).join('')}</div><div class="hint" aria-live="polite">${g.phase==='win'?'Bravo !':g.phase==='lose'?`C'était ${q.good}.`:''}</div>${over?`<div class="acts"><button class="btn" data-act="hnext">${g.r===4?'Voir mon score':'Suivant ▸'}</button></div>`:''}</div></div>`);
 }
 function heureAns(v){const g=S.g;if(g.phase!=='ask')return;g.pick=v;if(v===g.q.good){g.phase='win';g.score++}else g.phase='lose';render(true)}
 function heureNext(){const g=S.g;if(g.r>=4){g.phase='end';if(g.score>=3)g.nt=reward()}else{g.r++;g.q=heureQ(g.r);g.phase='ask';g.pick=null}render()}
@@ -652,10 +659,9 @@ document.addEventListener('click',e=>{
   else if(d.train){go('#/train/'+d.train)}
   else if(d.pick){go('#/jeu/tape/'+d.pick)}
   else if(d.chose){S.pick=d.chose;render()}
-  else if(d.city){const c=S.cities,i=c.indexOf(d.city);if(i>=0)c.splice(i,1);else if(c.length<3)c.push(d.city);render(true)}
-  
+    
   else if(d.act==='cred'){const p=b.nextElementSibling;p.hidden=!p.hidden;b.setAttribute('aria-expanded',String(!p.hidden))}
-  else if(d.act==='again'){S.cities=[];render()}
+  else if(d.act==='again')render()
   else if(d.act==='debug-off'){location.href=location.pathname+location.hash}
   else if(d.act==='hnext')heureNext();
   else if(d.act==='rail-go')railGo();
