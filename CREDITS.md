@@ -38,6 +38,10 @@ Licences : [CC0](https://creativecommons.org/publicdomain/zero/1.0/deed.fr) · [
 | `videos/corail.mp4` | BB 22200 et voitures Corail | wl/trains | CC BY 3.0 | [French electric locomotive BB26000-BB22200 with ICN 5774 Nice-Paris. 4K UHD Dolby Sound.webm](https://commons.wikimedia.org/wiki/File:French_electric_locomotive_BB26000-BB22200_with_ICN_5774_Nice-Paris._4K_UHD_Dolby_Sound.webm) |
 | `videos/regiolis.mp4` | Régiolis | Manchesterunited1234 | CC BY-SA 4.0 | [Station Transilien - La Ferté-sous-Jouarre - Départ TER (Fluo Grand Est) - (Régiolis, B 85000) - (La Ferté-sous-Jouarre, FR77) - 17-04-2026.webm](https://commons.wikimedia.org/wiki/File:Station_Transilien_-_La_Fert%C3%A9-sous-Jouarre_-_D%C3%A9part_TER_(Fluo_Grand_Est)_-_(R%C3%A9giolis,_B_85000)_-_(La_Fert%C3%A9-sous-Jouarre,_FR77)_-_17-04-2026.webm) |
 
+## Vidéos YouTube
+
+Intégrées avec le lecteur YouTube (`youtube-nocookie.com`), chargées seulement au clic. Les vidéos appartiennent à leurs auteurs. La liste est dans le tableau `YT` de `index.html`.
+
 ## Données
 
 Les chiffres des fiches (vitesses, places, dates, couleurs) viennent de Wikipédia en français. Le tableau complet, avec ce qu'on n'a pas pu vérifier, est dans `trains-corrected.csv`. Les horaires du jeu « Quelle heure ? » sont inventés.

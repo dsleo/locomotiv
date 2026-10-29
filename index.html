@@ -151,6 +151,12 @@ h1,h2,h3{margin:0;text-wrap:balance;font-weight:400}
 .rider svg{display:block;width:100%;height:auto}
 @keyframes ride{from{left:-660px}to{left:100%}}
 @keyframes bob{from{margin-bottom:0}to{margin-bottom:1px}}
+#pop{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(20,20,24,.6)}
+.popc{background:var(--t-panel);color:var(--t-pi);border-radius:var(--t-r);box-shadow:var(--t-sh);padding:22px;max-width:420px;width:100%;max-height:100%;overflow:auto;text-align:center;animation:popin .35s ease-out}
+.popc img{width:100%;display:block;margin:12px 0;border-radius:var(--t-r)}
+.popc h2{font-size:34px;line-height:1;margin-bottom:14px}
+@keyframes popin{from{transform:scale(.85);opacity:0}}
+@media (prefers-reduced-motion:reduce){.popc{animation:none}}
 @media (prefers-reduced-motion:reduce){.rider{animation:none;left:38%}}
 .stk2{position:relative}
 .stk2.off{opacity:.65}
@@ -174,11 +180,17 @@ h1,h2,h3{margin:0;text-wrap:balance;font-weight:400}
 .opt{min-height:60px;padding:0 20px;border:0;border-radius:var(--t-btn);background:var(--t-panel);color:var(--t-pi);font:clamp(22px,3.4vw,30px) var(--t-font);box-shadow:var(--t-sh)}
 .opt.good{background:#1F7A4A;color:#fff}
 .opt.bad{opacity:.5;text-decoration:line-through}
-.zoomimg{aspect-ratio:4/3;border:10px solid var(--t-panel);border-radius:var(--t-r);background-repeat:no-repeat;background-color:#ccc;box-shadow:var(--t-sh);transition:background-size .6s,background-position .6s}
 [data-sw]:focus-visible circle{stroke:#000;stroke-width:5}
 #dbg{position:fixed;left:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:20}
 .dbg{display:flex;align-items:center;gap:10px;background:#111;color:#fff;padding:8px 8px 8px 14px;border-radius:999px;font:700 13px/1 var(--body);box-shadow:0 4px 14px rgba(0,0,0,.35)}
 .dbg button{border:0;border-radius:999px;background:#fff;color:#111;padding:8px 14px;font:700 13px var(--body);min-height:36px}
+.back{display:inline-flex;align-items:center;min-height:44px;margin-bottom:6px;font:700 14px var(--body);letter-spacing:.04em;color:var(--t-ink);text-decoration:none}
+.back:hover{text-decoration:underline}
+.yts{display:flex;flex-direction:column;gap:8px}
+.ytb{display:flex;align-items:center;gap:12px;width:100%;min-height:52px;padding:8px 14px;border:0;border-radius:var(--t-btn);background:var(--t-panel);color:var(--t-pi);text-align:left;font:700 15px/1.25 var(--body);box-shadow:var(--t-sh)}
+.ytp{flex:none;width:34px;height:34px;border-radius:50%;background:var(--t-acc);color:var(--t-on);display:flex;align-items:center;justify-content:center;font-size:13px}
+.yt iframe{display:block;width:100%;aspect-ratio:16/9;border:0;border-radius:var(--t-r);background:#000}
+.ytlink{display:inline-block;margin-top:6px;font:700 13px var(--body);color:var(--t-ink)}
 @media (max-width:760px){.memo{grid-template-columns:repeat(3,minmax(0,1fr))}.hero,.tp,.setup,.era{grid-template-columns:minmax(0,1fr)}.collage{height:400px}.mini{width:calc(50% - 7px)}}
 @media (prefers-reduced-motion:reduce){.tile.bad{animation:none}}
 </style>
@@ -198,26 +210,52 @@ const SH={hard:'6px 6px 0 rgba(0,0,0,.35)',soft:'0 14px 30px -12px rgba(0,0,0,.4
 // thème : fond, texte sur fond, panneau, texte sur panneau, accent, texte sur accent, police, rayon, rayon des boutons, ombre
 const T=(bg,ink,panel,pi,acc,on,font,r,btn,sh)=>({bg,ink,panel,pi,acc,on,font,r,btn,sh:SH[sh]});
 const TRAINS=[
-{id:'picasso',name:'Autorail Picasso',word:'PICASSO',era:1,yrs:'1950–1988',speed:120,img:'picasso',pos:'50% 50%',by:'Jeanluc42',lic:'CC BY-SA 3.0',sub:`L'autorail à la cabine sur le toit`,t:T('#E6D2B5','#3A1E1E','#FBF3E4','#3A1E1E','#A3202E','#FFFFFF','Abril Fatface',4,'8px','hard'),stats:[['120','km/h'],['62 + 5','places assises + strapontins'],['1950–88','en service'],['Diesel','moteur Saurer ou Renault']],blurb:`Surnommé Picasso parce que le conducteur est installé dans une cabine sur le toit, décalée sur le côté, comme un visage dans un tableau de Picasso. Il desservait les lignes de campagne, peint en rouge et crème.`},
+{id:'picasso',cap:62,ci:1,name:'Autorail Picasso',word:'PICASSO',era:1,yrs:'1950–1988',speed:120,img:'picasso',pos:'50% 50%',by:'Jeanluc42',lic:'CC BY-SA 3.0',sub:`L'autorail à la cabine sur le toit`,t:T('#E6D2B5','#3A1E1E','#FBF3E4','#3A1E1E','#A3202E','#FFFFFF','Abril Fatface',4,'8px','hard'),stats:[['120','km/h'],['62 + 5','places assises + strapontins'],['1950–88','en service'],['Diesel','moteur Saurer ou Renault']],blurb:`Surnommé Picasso parce que le conducteur est installé dans une cabine sur le toit, décalée sur le côté, comme un visage dans un tableau de Picasso. Il desservait les lignes de campagne, peint en rouge et crème.`},
 {id:'cc6500',name:'CC 6500 Grand Confort',word:'CONFORT',era:1,yrs:'1969–2007',speed:200,img:'cc6500',pos:'70% 50%',by:'Phil Richards',lic:'CC BY-SA 2.0',sub:'La locomotive « coup de soleil »',t:T('#C9CCCE','#1F2327','#F2F3F4','#1F2327','#A3202E','#FFFFFF','Inter Tight',6,'0','hard'),stats:[['200','km/h'],['1,5 kV','électrique, courant continu'],['1969–75','mises en service'],['3','couleurs : gris, rouge, orange']],blurb:`Le designer Paul Arzens l'a peinte dans sa livrée « coup de soleil » : gris métallisé, rouge Capitole et orange. Elle tractait des trains célèbres comme le Mistral et le Capitole.`},
 {id:'capitole',name:'BB 9200 Le Capitole',word:'CAPITOLE',era:1,yrs:'1957–2015',speed:200,img:'capitole',pos:'55% 50%',by:'andreboeni',lic:'CC BY 2.0',sub:'La locomotive rouge de Paris–Toulouse',t:T('#A3202E','#F7EFE3','#EADFC8','#23262B','#EADFC8','#A3202E','Cinzel',6,'6px','hard'),stats:[['1967','premier train voyageurs à 200 km/h'],['1957–64','locomotives construites'],['Paris – Toulouse','ligne du Capitole'],['Rouge','avec un bandeau gris clair']],blurb:`En 1967, le Capitole inaugure le premier service voyageurs à 200 km/h en France. La photo montre la BB 9291 dans un musée, avec son écusson ailé.`},
 {id:'caravelle',name:'Autorail Caravelle',word:'CARAVELLE',era:1,yrs:'1963–2010',speed:120,img:'caravelle',pos:'50% 50%',by:'jhm0284',lic:'CC BY-SA 2.0',sub:'Rouge et crème pendant presque cinquante ans',t:T('#A3202E','#FFF4E6','#F3E9D2','#3A1E1E','#F3E9D2','#A3202E','Oswald',0,'0','hard'),stats:[['120','km/h'],['133–141','places assises'],['1963–2010','en service'],['Diesel','boîte mécanique']],blurb:`La Caravelle a roulé en Auvergne, en Normandie, en Bourgogne, en Bretagne et dans bien d'autres régions. Plus tard, chaque région a choisi sa couleur.`},
 {id:'corail',name:'Corail',word:'CORAIL',era:2,yrs:'depuis 1975',img:'corail',video:{f:'corail',by:'wl/trains',lic:'CC BY 3.0'},pos:'45% 55%',by:'Skililipappa',lic:'CC BY-SA 4.0',sub:'Des voitures confortables aux portes orange',t:T('#E75B12','#1A1D21','#CBD0CC','#1A1D21','#434B4D','#F3F0E6','Archivo',4,'0','hard'),stats:[['1975','début des voitures Corail'],['160','km/h'],['58–88','places par voiture'],['2',`systèmes d'alimentation (BB 22200)`]],blurb:`Les premiers Corail roulent entre Paris et Bordeaux en juin 1975. Les voitures ont une bande anthracite et des portes orange. La locomotive de la photo est une BB 22200, dans sa livrée grise d'aujourd'hui.`},
-{id:'sudest',name:'TGV Sud-Est',word:'SUDEST',era:2,yrs:'depuis 1980',speed:270,img:'orange',pos:'35% 60%',by:'Phillip Capper',lic:'CC BY 2.0',sub:'Le premier TGV, tout en orange',t:T('#E8681C','#1E1A17','#FFF1DD','#1E1A17','#1E1A17','#FFF1DD','Barlow Condensed',0,'0','none'),stats:[['260 → 270','km/h'],['368','places assises'],['200 m','de long'],['1981',`27 septembre : ouverture de la ligne`]],blurb:`Construit à partir de 1978, en orange vif. La ligne à grande vitesse Paris–Lyon ouvre le 27 septembre 1981. Au début, seuls quelques trains peuvent circuler.`},
+{id:'sudest',cap:368,ci:1,name:'TGV Sud-Est',word:'SUDEST',era:2,yrs:'depuis 1980',speed:270,img:'orange',pos:'35% 60%',by:'Phillip Capper',lic:'CC BY 2.0',sub:'Le premier TGV, tout en orange',t:T('#E8681C','#1E1A17','#FFF1DD','#1E1A17','#1E1A17','#FFF1DD','Barlow Condensed',0,'0','none'),stats:[['260 → 270','km/h'],['368','places assises'],['200 m','de long'],['1981',`27 septembre : ouverture de la ligne`]],blurb:`Construit à partir de 1978, en orange vif. La ligne à grande vitesse Paris–Lyon ouvre le 27 septembre 1981. Au début, seuls quelques trains peuvent circuler.`},
 {id:'poste',name:'TGV La Poste',word:'POSTE',era:2,yrs:'1984–2015',speed:270,img:'poste',pos:'70% 70%',by:'Florian Fèvre',lic:'CC BY-SA 4.0',sub:'Le train jaune de nuit pour les lettres',t:T('#FFCD00','#293133','#FFF8D6','#293133','#293133','#FFCD00','Outfit',22,'999px','soft'),stats:[['1984–2015','années de service'],['270','km/h'],['0','voyageur : seulement du courrier'],['Paris → Cavaillon','la nuit, par Mâcon']],blurb:`Un TGV jaune sans voyageurs. La nuit, il transportait des lettres et des colis pour La Poste. Son dernier voyage a eu lieu le 27 juin 2015.`},
-{id:'z5600',name:'RER C Z 5600',word:'RER',era:2,yrs:'depuis 1982',speed:140,img:'z5600',pos:'50% 50%',by:'Remontees',lic:'CC BY-SA 4.0',sub:'Le train de banlieue autour de Paris',t:T('#E4E8F2','#0B1B3F','#FFFFFF','#0B1B3F','#0033A0','#FFFFFF','IBM Plex Sans',10,'0','none'),stats:[['140','km/h'],['1 021','places dans un train de 4 voitures'],['1982','premier service'],['1,5 kV','électrique']],blurb:`Un train de banlieue du RER C. Aux heures de pointe, des centaines de personnes montent à bord, debout ou assises.`},
-{id:'atlantique',name:'TGV Atlantique',word:'TGV',era:3,yrs:'depuis 1989',speed:300,img:'atlantique',pos:'30% 45%',by:'MakotoVRC',lic:'CC0',sub:'Argent et bleu, avec un record du monde sur le nez',t:T('#1F3AA8','#FFFFFF','#E4E7EB','#1B2540','#FFFFFF','#1F3AA8','Figtree',18,'999px','soft'),stats:[['300','km/h'],['485','places assises'],['237 m','de long'],['1989','premiers voyageurs']],blurb:`Dessiné par Roger Tallon. La rame 325, sur la photo, porte 515,3 km/h sur le nez : le record du monde de vitesse.`},
-{id:'duplex',name:'TGV Duplex',word:'DUPLEX',era:3,yrs:'depuis 1995',speed:320,img:'duplex',video:{f:'duplex',by:'JMoaetlh',lic:'CC BY-SA 3.0'},pos:'50% 28%',by:'Kabelleger / David Gubler',lic:'CC BY-SA 4.0',sub:'Le TGV à deux étages',t:T('#1A2B3C','#F2F4F7','#DDE3EA','#1A2B3C','#B3174F','#FFFFFF','DM Sans',14,'14px','soft'),stats:[['320','km/h'],['510','places assises'],['200 m','de long'],['1995','premier service']],blurb:`Deux étages, donc plus de place pour les voyageurs. Certains Duplex ont ensuite pris les couleurs d'Ouigo. Celui-ci traverse le viaduc de Cize-Bolozon.`},
-{id:'teoz',name:'Corail Téoz',word:'TEOZ',era:3,yrs:'2003–2012',speed:200,img:'teoz',pos:'40% 50%',by:'patrick janicek',lic:'CC BY 2.0',sub:'Des voitures jaunes, bleues et vertes',t:T('#F2B705','#2A2420','#FFF6D6','#2A2420','#2F6FB0','#FFFFFF','Rubik',12,'12px','hard'),stats:[['200','km/h'],['401','places dans 7 voitures'],['2003–2012','les années Téoz'],['Jaune · bleu · vert','1re classe · 2e classe · service']],blurb:`Des voitures Corail rénovées pour les grandes lignes sans TGV, comme Paris–Clermont-Ferrand et Bordeaux–Nice. La marque disparaît le 2 janvier 2012.`},
-{id:'ater',name:'TER ATER X 73500',word:'ATER',era:3,yrs:'depuis 1999',speed:140,img:'ater',pos:'50% 50%',by:'Florian Pépellin',lic:'CC BY-SA 4.0',sub:'La petite baleine bleue',t:T('#0033A0','#FFFFFF','#E6EAF2','#0B1B3F','#007A3D','#FFFFFF','Public Sans',8,'8px','hard'),stats:[['140','km/h'],['61 + 21','places + strapontins'],['318','construits'],['Diesel','deux moteurs']],blurb:`Ses surnoms : Baleines bleues, Concombres et, quand deux circulent ensemble, Saucisses. Il dessert les lignes de campagne dans de nombreuses régions.`},
+{id:'z5600',cap:1021,ci:1,name:'RER C Z 5600',word:'RER',era:2,yrs:'depuis 1982',speed:140,img:'z5600',pos:'50% 50%',by:'Remontees',lic:'CC BY-SA 4.0',sub:'Le train de banlieue autour de Paris',t:T('#E4E8F2','#0B1B3F','#FFFFFF','#0B1B3F','#0033A0','#FFFFFF','IBM Plex Sans',10,'0','none'),stats:[['140','km/h'],['1 021','places dans un train de 4 voitures'],['1982','premier service'],['1,5 kV','électrique']],blurb:`Un train de banlieue du RER C. Aux heures de pointe, des centaines de personnes montent à bord, debout ou assises.`},
+{id:'atlantique',cap:485,ci:1,name:'TGV Atlantique',word:'TGV',era:3,yrs:'depuis 1989',speed:300,img:'atlantique',pos:'30% 45%',by:'MakotoVRC',lic:'CC0',sub:'Argent et bleu, avec un record du monde sur le nez',t:T('#1F3AA8','#FFFFFF','#E4E7EB','#1B2540','#FFFFFF','#1F3AA8','Figtree',18,'999px','soft'),stats:[['300','km/h'],['485','places assises'],['237 m','de long'],['1989','premiers voyageurs']],blurb:`Dessiné par Roger Tallon. La rame 325, sur la photo, porte 515,3 km/h sur le nez : le record du monde de vitesse.`},
+{id:'duplex',cap:510,ci:1,name:'TGV Duplex',word:'DUPLEX',era:3,yrs:'depuis 1995',speed:320,img:'duplex',video:{f:'duplex',by:'JMoaetlh',lic:'CC BY-SA 3.0'},pos:'50% 28%',by:'Kabelleger / David Gubler',lic:'CC BY-SA 4.0',sub:'Le TGV à deux étages',t:T('#1A2B3C','#F2F4F7','#DDE3EA','#1A2B3C','#B3174F','#FFFFFF','DM Sans',14,'14px','soft'),stats:[['320','km/h'],['510','places assises'],['200 m','de long'],['1995','premier service']],blurb:`Deux étages, donc plus de place pour les voyageurs. Certains Duplex ont ensuite pris les couleurs d'Ouigo. Celui-ci traverse le viaduc de Cize-Bolozon.`},
+{id:'teoz',cap:401,ci:1,name:'Corail Téoz',word:'TEOZ',era:3,yrs:'2003–2012',speed:200,img:'teoz',pos:'40% 50%',by:'patrick janicek',lic:'CC BY 2.0',sub:'Des voitures jaunes, bleues et vertes',t:T('#F2B705','#2A2420','#FFF6D6','#2A2420','#2F6FB0','#FFFFFF','Rubik',12,'12px','hard'),stats:[['200','km/h'],['401','places dans 7 voitures'],['2003–2012','les années Téoz'],['Jaune · bleu · vert','1re classe · 2e classe · service']],blurb:`Des voitures Corail rénovées pour les grandes lignes sans TGV, comme Paris–Clermont-Ferrand et Bordeaux–Nice. La marque disparaît le 2 janvier 2012.`},
+{id:'ater',cap:61,ci:1,name:'TER ATER X 73500',word:'ATER',era:3,yrs:'depuis 1999',speed:140,img:'ater',pos:'50% 50%',by:'Florian Pépellin',lic:'CC BY-SA 4.0',sub:'La petite baleine bleue',t:T('#0033A0','#FFFFFF','#E6EAF2','#0B1B3F','#007A3D','#FFFFFF','Public Sans',8,'8px','hard'),stats:[['140','km/h'],['61 + 21','places + strapontins'],['318','construits'],['Diesel','deux moteurs']],blurb:`Ses surnoms : Baleines bleues, Concombres et, quand deux circulent ensemble, Saucisses. Il dessert les lignes de campagne dans de nombreuses régions.`},
 {id:'agc',name:'TER AGC',word:'AGC',era:4,yrs:'depuis 2004',speed:160,img:'agc',pos:'50% 50%',by:'Yoyo697',lic:'CC BY-SA 4.0',sub:`L'autorail à grande capacité`,t:T('#1E7A4E','#FFFFFF','#EAF3EE','#10361F','#FFFFFF','#1E7A4E','Montserrat',16,'999px','soft'),stats:[['160','km/h'],['163–272','places assises'],['2004','première livraison'],['Bimode','diesel ou électrique']],blurb:`AGC veut dire autorail à grande capacité. Certaines versions passent du diesel aux fils électriques.`},
 {id:'ter2n',name:'TER 2N NG',word:'TER',era:4,yrs:'2004–2010',speed:160,img:'ter2n',pos:'60% 50%',by:'Pierre Poschadel',lic:'CC BY-SA 4.0',sub:'Un train à deux étages pour la région',t:T('#00387B','#FFFFFF','#E5E8EC','#0B1B3F','#E5E8EC','#00387B','Inter Tight',6,'0','none'),stats:[['160','km/h'],['219–570','places selon la longueur'],['2004–10','livraisons'],['2 étages','à deux niveaux']],blurb:`Sur cette photo, le TER 2N NG est à côté de son cadet, un Regio 2N, à Saint-Quentin.`},
 {id:'regio2n',name:'TER Regio 2N',word:'REGIO',era:4,yrs:'depuis 2014',img:'regio2n',pos:'50% 50%',by:'RAIL P (RAIL.PHOTOGRAPHY)',lic:'CC0',sub:'Le grand TER à deux étages',t:T('#6B7480','#FFFFFF','#F2F2F2','#23272E','#C8282D','#FFFFFF','Public Sans',10,'0','hard'),stats:[['160–200','km/h'],['350–770','places assises'],['2014','premier service'],['2 étages','à deux niveaux']],blurb:`Chaque région lui donne ses couleurs : BreizhGo en Bretagne, Aléop en Pays de la Loire, et d'autres.`},
 {id:'regiolis',name:'Régiolis',word:'REGIOLIS',era:4,yrs:'depuis 2014',speed:160,img:'regiolis',video:{f:'regiolis',by:'Manchesterunited1234',lic:'CC BY-SA 4.0'},pos:'50% 50%',by:'RAIL P (RAIL.PHOTOGRAPHY)',lic:'CC0',sub:'Bimode : diesel et électrique',t:T('#2F3234','#F2EFEC','#E8E4E1','#23272E','#B3174F','#FFFFFF','DM Sans',12,'12px','soft'),stats:[['160','km/h'],['220–360','places assises'],['2014','premier voyage : 22 avril'],['Bimode','diesel + électrique']],blurb:`Son premier voyage a emmené des voyageurs de Bordeaux à Agen le 22 avril 2014. Il circule aujourd'hui dans onze régions.`},
-{id:'ouigo',name:'OUIGO',word:'OUIGO',era:5,yrs:'depuis 2013',img:'ouigo',pos:'60% 55%',by:'Hoff1980',lic:'CC BY-SA 3.0',sub:'Le TGV à petit prix',t:T('#00B6E3','#0B2A3A','#FFFFFF','#0B2A3A','#D0006F','#FFFFFF','Manrope',28,'999px','soft'),stats:[['634','places dans un train'],['510','dans un TGV Duplex normal'],['2013','lancé en avril'],['2 étages','à deux niveaux']],blurb:`Un TGV avec plus de places et des prix plus bas, pour que plus de monde puisse voyager. Il démarre le 2 avril 2013.`},
-{id:'inoui',name:'TGV inOui',word:'INOUI',era:5,yrs:'depuis 2017',speed:300,img:'inoui',pos:'75% 45%',by:'A.lloyd999ify',lic:'CC BY-SA 4.0',sub:'Une vieille rame Atlantique aux couleurs neuves',t:T('#F4F1EE','#23272E','#FFFFFF','#23272E','#B3174F','#FFFFFF','Nunito',32,'999px','soft'),stats:[['300','km/h'],['≈ 450','places après rénovation'],['237 m','de long'],['2017','naissance du nom inOui']],blurb:`Le nom TGV inOui est présenté en 2017 et concerne aujourd'hui tous les TGV classiques. Celui-ci est une rame Atlantique en gris, blanc et framboise.`},
+{id:'ouigo',cap:634,ci:0,name:'OUIGO',word:'OUIGO',era:5,yrs:'depuis 2013',img:'ouigo',pos:'60% 55%',by:'Hoff1980',lic:'CC BY-SA 3.0',sub:'Le TGV à petit prix',t:T('#00B6E3','#0B2A3A','#FFFFFF','#0B2A3A','#D0006F','#FFFFFF','Manrope',28,'999px','soft'),stats:[['634','places dans un train'],['510','dans un TGV Duplex normal'],['2013','lancé en avril'],['2 étages','à deux niveaux']],blurb:`Un TGV avec plus de places et des prix plus bas, pour que plus de monde puisse voyager. Il démarre le 2 avril 2013.`},
+{id:'inoui',cap:450,ci:1,name:'TGV inOui',word:'INOUI',era:5,yrs:'depuis 2017',speed:300,img:'inoui',pos:'75% 45%',by:'A.lloyd999ify',lic:'CC BY-SA 4.0',sub:'Une vieille rame Atlantique aux couleurs neuves',t:T('#F4F1EE','#23272E','#FFFFFF','#23272E','#B3174F','#FFFFFF','Nunito',32,'999px','soft'),stats:[['300','km/h'],['≈ 450','places après rénovation'],['237 m','de long'],['2017','naissance du nom inOui']],blurb:`Le nom TGV inOui est présenté en 2017 et concerne aujourd'hui tous les TGV classiques. Celui-ci est une rame Atlantique en gris, blanc et framboise.`},
 {id:'jaune',name:'Le Train Jaune',word:'JAUNE',era:6,yrs:'depuis 1910',speed:60,img:'jaune',pos:'20% 60%',by:'Mike McBey',lic:'CC BY 2.0',sub:'Le petit train jaune des Pyrénées',t:T('#F2B705','#2A2420','#FBF6E6','#2A2420','#B5232A','#FFFFFF','Abril Fatface',24,'999px','soft'),stats:[['60','km/h au maximum'],['850 V','courant par un troisième rail'],['1 592 m','Bolquère-Eyne, plus haute gare SNCF'],['1910','ouverture du premier tronçon']],blurb:`Jaune canari et rouge, les couleurs catalanes. Il grimpe de Villefranche-de-Conflent à Latour-de-Carol à travers la montagne.`}
 ];
+/* Vidéos YouTube : choisies d'après leur titre, chargées seulement au clic (youtube-nocookie). */
+const YT={
+picasso:[['JpFISqRPDSI',"À bord d'un autorail X 3800 « Picasso »"],['XZ6MMS5p98Y',"À bord de l'autorail X 3800"]],
+cc6500:[['6olznWSVPQ0','La naissance de la CC 6500'],['qJ4JDxm7YxA','En cabine : la CC 6502 du Capitole'],['v4XNVXPZA9s',"L'intégrale des CC 6500"]],
+capitole:[['Vr6SLMoRmCk','Une BB 9200 à Paris-Austerlitz'],['gsG3bBZ7Dgw','Les BB 9200']],
+caravelle:[['G4a-SFnH7xw','Les autorails Caravelle en 2003'],['ay4S-hYe8LE',"Une Caravelle arrive en gare et repart"]],
+corail:[['GqjvVw16c9M','La première classe du train Corail'],['EtA2vWJEVRw',"Dans les coulisses d'un train Corail"],['HUntP_mx3B0','La BB 22200 sous toutes les coutures']],
+sudest:[['DQjjkR07YOU','Adieu au TGV orange'],['7eTtvy13raA','En cabine de queue, TGV orange de 1984'],['835Y48wX0vw','La rame 01 : orange, carmillon, bleue']],
+poste:[['rqAhHLFmd8M','TGV Postal collection'],['i4WZzDCwexM','Adieu TGV Postal !'],['Re5ZV8cZZlc','2 minutes à bord du TGV Postal'],['dQYVWqUGs9I','TGV La Poste (intérieur)']],
+z5600:[['q0mUuvnigiM','Une Z 5600 à Brétigny (RER C)'],['fq7BF67tDQU','La Z 5600, train à deux étages du RER C']],
+atlantique:[['3NOjMLNcG_0','La rame 325 : record du monde, 515,3 km/h'],['J4cT6SACCjQ','515,3 km/h, le 18 mai 1990']],
+duplex:[['XdNQ03Go4U8','En cabine du TGV Duplex'],['q_4BW0t_GeU','À bord du TGV Duplex Toulouse–Dijon']],
+teoz:[['eYJjh-44wpE','Un Téoz Paris–Clermont à pleine vitesse'],['XhMdMF9PQXc','Retour sur les trains Téoz']],
+ater:[['fLaJkXf1bio','Les X 73500 (A TER)'],['7BVS-QdTLLo','Voyage en X 73500 entre Épinal et Xertigny']],
+agc:[['m6IqYYEBmhE','AGC B 81500'],['K-2KtgSrnuY','Autorails AGC B 81500, X 76500, Z 27500']],
+ter2n:[['Asb9COdIr-c','Les TER 2N NG Z 24500 et Z 26500'],['IZUw608Qld8','Un TER 2N NG à Aix-les-Bains']],
+regio2n:[['o35BIPgfz60',"Visite complète d'un Régio 2N"],['R5Y-qlazKiE','Départ de Paris-Nord en Régio 2N']],
+regiolis:[['xvmq90mxiNM','Cabride en Régiolis'],['8-huqrp9kmw','Régiolis et Régio 2N à Toulouse']],
+ouigo:[['MfLUXBwrsKw','À bord du nouveau Ouigo'],['RiMbqA5duYE','Ouigo Duplex : Paris-Montparnasse → Hendaye']],
+inoui:[['PTOfHs4eDdA','Bienvenue à bord du futur TGV inOui'],['fk58dOLrBS0','Cabride en TGV inOui à 320 km/h']],
+jaune:[['MwaIZ2vsZkE','À bord du Train Jaune'],['GtWlJJylUsg','Le train jaune de Cerdagne']]
+};
+function ytPlay(b,id){
+  const box=b.closest('.yt');
+  box.innerHTML=`<iframe src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0" title="Vidéo YouTube" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe><a class="ytlink" href="https://www.youtube.com/watch?v=${id}" target="_blank" rel="noopener">Ouvrir sur YouTube</a>`;
+}
 const ERAS=[[1,'Les grands trains','1950 – 1975','#A3202E'],[2,'Corail et orange','1975 – 1988','#E8681C'],[3,'Argent et bleu','1989 – 2003','#1F3AA8'],[4,'Le TER partout','2004 – 2017','#1E7A4E'],[5,'Ouigo et inOui','2013 →','#00B6E3'],[6,'Toujours là','1910 →','#F2B705']];
 /* icônes des fiches : une par type d'information */
 const IC={
@@ -238,7 +276,7 @@ route:'<circle cx="6" cy="18" r="2"/><circle cx="18" cy="6" r="2"/><path d="M8 1
 mail:'<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 8l9 6 9-6"/>',
 mount:'<path d="M3 19l6-10 4 6 3-4 5 8z"/>',
 stack:'<path d="M3 8l9-4 9 4-9 4z"/><path d="M3 12l9 4 9-4M3 16l9 4 9-4"/>'};
-function ico(v,l){
+function icoKey(v,l){
   const x=(v+' '+l).toLowerCase();
   const k=/courrier/.test(x)?'mail'
     :/^\d{4}/.test(v)?'cal'
@@ -252,8 +290,9 @@ function ico(v,l){
     :/couleur|rouge|jaune|bandeau/.test(x)?'palette'
     :/paris|toulouse|cavaillon|ligne/.test(x)?'route'
     :'stack';
-  return `<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${IC[k]}</svg>`;
+  return k;
 }
+function ico(v,l){return `<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${IC[icoKey(v,l)]}</svg>`}
 const credBtn=(t,k='Photo')=>`<button class="info" data-act="cred" aria-expanded="false" aria-label="Crédit ${k.toLowerCase()}">i</button><div class="credpop" hidden>${k} ${t.by} · ${t.lic} · Wikimedia Commons</div>`;
 const $=s=>document.querySelector(s);
 const byId=id=>TRAINS.find(t=>t.id===id);
@@ -263,17 +302,14 @@ const lum=h=>{const v=[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)/255).map(c=>c<=
 const line=t=>[t.t.acc,t.t.ink,'#C8282D'].find(c=>lum(c)<.3)||'#C8282D';
 let save={seen:[],trips:0};
 try{const s=JSON.parse(localStorage.getItem('carnet-v1')||'null');if(s&&Array.isArray(s.seen))save=s}catch(e){}
+save.pend=save.pend||{};save.solved=save.solved||{};
 const persist=()=>{try{localStorage.setItem('carnet-v1',JSON.stringify(save))}catch(e){}};
-/* Mode test : ajoute ?debug à l'adresse (ou #debug) pour tout débloquer et voir tous les jeux. ?debug=0 pour le quitter. */
-let debug=false;
-try{
-  if(/[?&]debug=0\b/.test(location.search))localStorage.removeItem('carnet-debug');
-  else if(/[?&]debug\b/.test(location.search)||location.hash==='#debug')localStorage.setItem('carnet-debug','1');
-  debug=localStorage.getItem('carnet-debug')==='1';
-}catch(e){debug=/[?&]debug\b/.test(location.search)||location.hash==='#debug'}
+/* Mode test : ajoute ?debug à l'adresse pour tout débloquer et voir tous les jeux. Il n'est pas mémorisé : sans ?debug, le jeu est normal. */
+const debug=/[?&]debug\b/.test(location.search);
+try{localStorage.removeItem('carnet-debug')}catch(e){}
 const unlockedN=()=>debug?TRAINS.length:Math.min(TRAINS.length,1+save.trips);
 const unlocked=t=>TRAINS.indexOf(t)<unlockedN();
-const S={v:'home',id:'picasso',cities:['Paris','Lyon','Bordeaux'],pick:'picasso',play:null,sg:null,confirm:false,gt:'picasso',gk:null,g:null};
+const S={v:'home',id:'picasso',cities:['Paris','Lyon','Bordeaux'],pick:'picasso',play:null,sg:null,confirm:false,gt:'picasso',gk:null,g:null,other:null};
 
 function route(a,b){
   const w=(x,y,k)=>Math.hypot(CITY[x][0]-CITY[y][0],CITY[x][1]-CITY[y][1])*(k==='L'?0.6:1.4);
@@ -293,7 +329,7 @@ function mapSVG(opts){
 
 function nav(){
   const items=[['eras','Époques'],['album','Mon album']];
-  const cur=['train','journey','speed','memo','heure','rail','bon'].includes(S.v)?'eras':S.v;
+  const cur=['train','journey','speed','memo','heure','rail'].includes(S.v)?'eras':S.v;
   $('#nav').innerHTML=items.map(([k,l])=>`<button data-go="${k}" ${cur===k?'aria-current="page"':''}>${l}</button>`).join('');
 }
 const mini=t=>{const lock=!unlocked(t);return `<button class="mini ${lock?'lock':''}" data-train="${t.id}" style="${th(t.t)}" aria-label="${t.name}${lock?', verrouillé':''}"><img src="${photo(t)}" alt="" style="object-position:${t.pos}"><span>${t.name}<small>${lock?'Verrouillé':t.yrs}</small></span></button>`};
@@ -314,16 +350,16 @@ function trainPage(){
   const t=byId(S.id),lock=!unlocked(t);
   const era=ERAS.find(e=>e[0]===t.era);
   if(!lock&&!save.seen.includes(t.id)){save.seen.push(t.id);persist()}
-  return `<article class="th" style="${th(t.t)}"><div class="era-tag">${era[1]} · ${t.yrs}</div><div class="tp"><div><div class="phw"><figure class="frame"><img src="${photo(t)}" alt="${t.name}" style="object-position:${t.pos};${lock?'filter:grayscale(1) blur(6px)':''}"></figure>${credBtn(t)}</div>${t.video&&!lock?`<div class="phw vid"><video controls playsinline preload="metadata" poster="${photo(t)}" src="videos/${t.video.f}.mp4" aria-label="Vidéo : ${t.name}"></video>${credBtn(t.video,'Vidéo')}</div>`:''}</div>
-  <div><h1>${t.name}</h1><div class="sub">${t.sub}</div>${lock?`<div class="stats"><div class="stat" style="grid-column:1/-1"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><b>Verrouillé</b><span>Réussis « Tape et roule » avec le train d'avant pour débloquer celui-ci.</span></div></div>`:`<div class="stats">${t.stats.map(s=>`<div class="stat">${ico(s[0],s[1])}<b>${s[0]}</b><span>${s[1]}</span></div>`).join('')}</div><p class="blurb">${t.blurb}</p>`}
-  <div class="games" style="margin-top:22px"><button class="game" data-pick="${t.id}" ${lock?'disabled':''}><svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${IC.kbd}</svg><b>Tape et roule</b></button>${debug?OTHER.filter(k=>k!=='speed'||t.speed).map(k=>otherCard(t,lock,k)).join(''):otherCard(t,lock)}</div></div></div></div>
+  return `<article class="th" style="${th(t.t)}"><div class="era-tag">${era[1]} · ${t.yrs}</div><div class="tp"><div><div class="phw"><figure class="frame"><img src="${photo(t)}" alt="${t.name}" style="object-position:${t.pos};${lock?'filter:grayscale(1) blur(6px)':''}"></figure>${credBtn(t)}</div>${t.video&&!lock?`<div class="phw vid"><video controls playsinline preload="metadata" poster="${photo(t)}" src="videos/${t.video.f}.mp4" aria-label="Vidéo : ${t.name}"></video>${credBtn(t.video,'Vidéo')}</div>`:''}${YT[t.id]&&!lock?`<div class="yts"><div class="era-tag" style="margin:18px 0 8px">Vidéos sur YouTube</div>${YT[t.id].map(([id,ti])=>`<div class="yt"><button class="ytb" data-yt="${id}"><span class="ytp" aria-hidden="true">▶</span>${ti}</button></div>`).join('')}</div>`:''}</div>
+  <div><h1>${t.name}</h1><div class="sub">${t.sub}</div>${lock?`<div class="stats"><div class="stat" style="grid-column:1/-1"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><b>Verrouillé</b><span>Réussis « Tape et roule » avec le train d'avant pour débloquer celui-ci.</span></div></div>`:`<div class="stats">${t.stats.map((s,i)=>{const gi=t.stats.findIndex(x=>icoKey(x[0],x[1])==='gauge'),hide=(save.pend[t.id]==='speed'&&i===gi)||(save.pend[t.id]==='cap'&&i===t.ci);return `<div class="stat">${ico(s[0],s[1])}<b>${hide?'?':s[0]}</b><span>${s[1]}</span></div>`}).join('')}</div><p class="blurb">${t.blurb}</p>`}
+  <div class="games" style="margin-top:22px"><button class="game" data-pick="${t.id}" ${lock?'disabled':''}><svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${IC.kbd}</svg><b>Tape et roule</b></button>${debug?allOther(t).map(k=>otherCard(t,lock,k)).join(''):otherCard(t,lock)}</div></div></div></div>
   </article>`;
 }
 function journey(){
   const t=byId(S.pick),c=S.cities,ready=c.length===3,left=3-c.length;
   let legs=[];
   if(ready){for(let i=0;i<2;i++)legs.push(route(c[i],c[i+1]));S.play={t,legs,i:0,idx:0,over:false}}else S.play=null;
-  return `<article class="th" style="${th(t.t)}"><div class="era-tag" id="legtxt">Tape et roule · ${t.name}</div><div class="setup"><div class="mapcard">${mapSVG({sel:c,acc:line(t),land:'#fff',ink:'#23262B',stroke:'#9aa0a6'})}</div>
+  return `<article class="th" style="${th(t.t)}">${back(t)}<div class="era-tag" id="legtxt">Tape et roule · ${t.name}</div><div class="setup"><div class="mapcard">${mapSVG({sel:c,acc:line(t),land:'#fff',ink:'#23262B',stroke:'#9aa0a6'})}</div>
   <div><h1 style="font-size:clamp(32px,4.6vw,56px)">${ready?'On part !':'Choisis 3 villes'}</h1><div class="pills" style="margin:16px 0" role="group" aria-label="Villes">${Object.keys(CITY).map(n=>`<button class="pill" data-city="${n}" aria-pressed="${c.includes(n)}">${n}</button>`).join('')}</div>
   <div class="banner" id="msg" aria-live="polite" style="text-align:left;min-height:56px">${ready?'':`Choisis encore ${left} ${left>1?'villes':'ville'}, puis tape « ${t.word} » pour faire avancer le train.`}</div>
   <div class="tiles" id="tiles" aria-label="Lettres à taper">${ready?'':[...t.word].map(ch=>`<span class="tile">${ch}</span>`).join('')}</div>
@@ -332,56 +368,57 @@ function journey(){
 /* ---- Devine la vitesse ---- */
 const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
 const MAXTRIES=6,SLACK=10;
-function startSpeed(only){
+const sgVal=(g,t)=>g.kind==='cap'?t.cap:t.speed;
+const sgSlack=(g,t)=>g.kind==='cap'?Math.max(5,Math.round(t.cap*.1)):SLACK;
+function startSpeed(only,kind='speed'){
   const pool=TRAINS.filter(t=>t.speed&&unlocked(t));
   const order=only?[only]:shuffle(pool).slice(0,5).map(t=>t.id);
-  S.sg={order,r:0,tries:[],score:0,phase:'ask',gv:150,solo:!!only};S.v='speed';render();
+  S.sg={order,r:0,tries:[],score:0,wins:0,phase:'ask',gv:kind==='cap'?300:150,solo:!!only,kind};S.v='speed';render();
 }
 function speed(){
   const g=S.sg;
   if(!g)return `<div style="padding-block:24px"><div class="eyebrow">Jouer à</div><h1 style="font-family:var(--display);font-size:clamp(36px,6vw,60px);line-height:1;color:var(--red)">Plus ou moins</h1><p style="max-width:52ch;font-size:18px">Cinq trains, six essais pour chacun. Après chaque essai, on te dit « plus haut » ou « plus bas ». Tu gagnes si tu tombes à ${SLACK} km/h près de la vitesse maximale en service.</p><div class="acts"><button class="btn" style="background:var(--red);color:#fff;display:inline-flex;align-items:center;min-height:56px;padding:0 28px;border:0;border-radius:999px;font-family:var(--display);font-size:24px" data-act="speedstart">C'est parti ▸</button></div></div>`;
-  if(g.phase==='end'){
-    const max=g.order.length*(MAXTRIES);
-    return `<article class="th" style="${th(byId(g.order[g.order.length-1]).t)}"><div class="end"><h2>${g.solo?'Terminé !':'Bravo !'}</h2><p style="font-family:var(--body);font-size:20px">Score : <b>${g.score}</b> sur ${max}.</p><div class="acts" style="justify-content:center"><button class="btn" data-act="speedstart">Rejouer</button><button class="btn alt" data-go="eras">Voir les trains</button></div></div></article>`;
-  }
+  if(g.phase==='end'){S.gt=g.order[g.order.length-1];S.gk='speed';const need=Math.min(3,g.order.length),ok=g.wins>=need;return gwrap(gend(`${g.wins} bonne${g.wins>1?'s':''} réponse${g.wins>1?'s':''} sur ${g.order.length}.${ok?'':` Il en faut ${need} pour débloquer le train suivant.`}`,ok,g.nt))}
   const t=byId(g.order[g.r]),tr=g.tries,last=tr[tr.length-1],over=g.phase!=='ask';
-  const hint=last&&!over?(last.v<t.speed?'Plus haut ↑':'Plus bas ↓'):'';
-  const closing=g.phase==='win'?`Bravo ! Il roule à ${t.speed} km/h. Tu étais à ${Math.abs(last.v-t.speed)} km/h près.`:`C'était ${t.speed} km/h.`;
+  const cap=g.kind==='cap',val=sgVal(g,t),sl=sgSlack(g,t),unit=cap?'places':'km/h';
+  const hint=last&&!over?(last.v<val?'Plus haut ↑':'Plus bas ↓'):'';
+  const closing=g.phase==='win'?(cap?`Bravo ! Il a ${val} places. Tu étais à ${Math.abs(last.v-val)} places près.`:`Bravo ! Il roule à ${val} km/h. Tu étais à ${Math.abs(last.v-val)} km/h près.`):(cap?`Il a ${val} places.`:`C'était ${val} km/h.`);
   const lastOne=g.r===g.order.length-1;
-  return `<article class="th" style="${th(t.t)}"><div class="era-tag">${g.solo?'Une seule question':`Train ${g.r+1} sur ${g.order.length}`} · Essai ${Math.min(tr.length+(over?0:1),MAXTRIES)} sur ${MAXTRIES} · Score ${g.score}</div><div class="tp"><div class="phw"><figure class="frame"><img src="${photo(t)}" alt="${t.name}" style="object-position:${t.pos}"></figure>${credBtn(t)}</div>
-  <div><h1 style="font-size:clamp(36px,5vw,64px)">${t.name}</h1><div class="sub">À quelle vitesse maximale roule-t-il ?</div>
-  <div class="big" id="sg-big">${g.gv}<small> km/h</small></div>
-  <input class="rng" id="sg-range" type="range" min="0" max="350" step="5" value="${g.gv}" aria-label="Vitesse en km/h" ${over?'disabled':''}>
-  <div class="stepper"><button class="btn alt" data-step="-10" ${over?'disabled':''}>−10</button><button class="btn alt" data-step="-1" ${over?'disabled':''}>−1</button><button class="btn alt" data-step="1" ${over?'disabled':''}>+1</button><button class="btn alt" data-step="10" ${over?'disabled':''}>+10</button></div>
-  <input id="sg-in" type="number" inputmode="numeric" min="0" max="400" value="${g.gv}" aria-label="Ta réponse" ${over?'disabled':''}>
+  return `<article class="th" style="${th(t.t)}">${back(t)}<div class="era-tag">${g.solo?'Une seule question':`Train ${g.r+1} sur ${g.order.length}`} · Essai ${Math.min(tr.length+(over?0:1),MAXTRIES)} sur ${MAXTRIES} · Score ${g.score}</div><div class="tp"><div class="phw"><figure class="frame"><img src="${photo(t)}" alt="${t.name}" style="object-position:${t.pos}"></figure>${credBtn(t)}</div>
+  <div><h1 style="font-size:clamp(36px,5vw,64px)">${t.name}</h1><div class="sub">${cap?'Combien de places a-t-il ?':'À quelle vitesse maximale roule-t-il ?'}</div>
+  <div class="big" id="sg-big">${g.gv}<small> ${unit}</small></div>
+  <input class="rng" id="sg-range" type="range" min="0" max="${cap?1100:350}" step="5" value="${g.gv}" aria-label="${cap?'Nombre de places':'Vitesse en km/h'}" ${over?'disabled':''}>
+  <div class="stepper">${(cap?[-100,-10,10,100]:[-10,-1,1,10]).map(n=>`<button class="btn alt" data-step="${n}" ${over?'disabled':''}>${n>0?'+'+n:'−'+Math.abs(n)}</button>`).join('')}</div>
+  <input id="sg-in" type="number" inputmode="numeric" min="0" max="${cap?2000:400}" value="${g.gv}" aria-label="Ta réponse" ${over?'disabled':''}>
   <div class="hint" aria-live="polite">${over?closing:hint}</div>
   ${over?`<div class="acts" style="justify-content:center"><button class="btn" data-act="next">${lastOne?'Voir mon score':'Train suivant ▸'}</button></div>`:`<div class="acts" style="justify-content:center"><button class="btn" data-act="guess">Valider</button></div>`}
-  <ul class="hist" aria-label="Tes essais">${tr.map(x=>`<li>${x.v} km/h ${x.v===t.speed||Math.abs(x.v-t.speed)<=SLACK?'✓':x.v<t.speed?'↑':'↓'}</li>`).join('')}</ul>
-  <p class="cred">Vitesse maximale en service. Tu gagnes à ${SLACK} km/h près.</p></div></div></article>`;
+  <ul class="hist" aria-label="Tes essais">${tr.map(x=>`<li>${x.v} ${unit} ${Math.abs(x.v-val)<=sl?'✓':x.v<val?'↑':'↓'}</li>`).join('')}</ul>
+  <p class="cred">${cap?`Nombre de places de la fiche. Tu gagnes à ${sl} places près.`:`Vitesse maximale en service. Tu gagnes à ${SLACK} km/h près.`}</p></div></div></article>`;
 }
 function setGv(v){
-  const g=S.sg;v=Math.max(0,Math.min(400,Math.round(v)));g.gv=v;
+  const g=S.sg,cap=g.kind==='cap';v=Math.max(0,Math.min(cap?2000:400,Math.round(v)));g.gv=v;
   const r=$('#sg-range'),n=$('#sg-in'),b=$('#sg-big');
-  if(r)r.value=Math.min(v,350);if(n)n.value=v;if(b)b.firstChild.nodeValue=v;
+  if(r)r.value=Math.min(v,cap?1100:350);if(n)n.value=v;if(b)b.firstChild.nodeValue=v;
 }
 function guess(){
   const g=S.sg,t=byId(g.order[g.r]),v=Number($('#sg-in').value);
   if(!Number.isFinite(v))return;
   g.tries.push({v});
-  if(Math.abs(v-t.speed)<=SLACK){g.phase='win';g.score+=Math.max(1,MAXTRIES+1-g.tries.length)}
+  if(Math.abs(v-sgVal(g,t))<=sgSlack(g,t)){g.phase='win';g.wins++;g.score+=Math.max(1,MAXTRIES+1-g.tries.length);delete save.pend[t.id];save.solved[t.id+':'+g.kind]=1;persist()}
   else if(g.tries.length>=MAXTRIES)g.phase='lose';
   g.gv=v;render(true);
 }
 function nextSpeed(){
   const g=S.sg;
-  if(g.r<g.order.length-1){g.r++;g.tries=[];g.phase='ask';g.gv=150;render()}
-  else{g.phase='end';render()}
+  if(g.r<g.order.length-1){g.r++;g.tries=[];g.phase='ask';g.gv=g.kind==='cap'?300:150;render()}
+  else{g.phase='end';if(g.wins>=Math.min(3,g.order.length))g.nt=reward();render()}
 }
 function render(keep){
   nav();
   $('#dbg').innerHTML=debug?'<div class="dbg">MODE TEST : tout est débloqué <button data-act="debug-off">Quitter</button></div>':'';
-  $('#app').innerHTML=S.v==='home'?home():S.v==='eras'?eras():S.v==='train'?trainPage():S.v==='journey'?journey():S.v==='album'?album():S.v==='memo'?memo():S.v==='heure'?heure():S.v==='rail'?rail():S.v==='bon'?bon():speed();
+  $('#app').innerHTML=S.v==='home'?home():S.v==='eras'?eras():S.v==='train'?trainPage():S.v==='journey'?journey():S.v==='album'?album():S.v==='memo'?memo():S.v==='heure'?heure():S.v==='rail'?rail():speed();
   if(S.v==='journey'&&S.play)initPlay();
+  if(S.v==='rail'&&S.g&&S.g.phase!=='set'){const p=$('#rp'),k=$('#rt');if(p&&k){const q=p.getPointAtLength(p.getTotalLength());k.setAttribute('transform',`translate(${q.x},${q.y})`)}}
   if(S.v==='speed'&&S.sg&&S.sg.phase==='ask'&&$('#sg-in')){
     $('#sg-range').addEventListener('input',e=>setGv(e.target.value));
     $('#sg-in').addEventListener('input',e=>setGv(e.target.value===''?0:e.target.value));
@@ -434,26 +471,44 @@ function legDone(){
   else finish(city);
 }
 function finish(city){
-  const P=S.play,before=unlockedN();P.over=true;save.trips++;persist();
-  const after=unlockedN(),nt=after>before?TRAINS[after-1]:null;
-  $('#msg').textContent=`Arrivée à ${city}.`;
-  $('#end').innerHTML=`<div class="end"><h2>Bravo !</h2><p>Tu as tapé ${P.t.word} et voyagé : ${S.cities.join(' → ')}.</p>${nt?`<h2 style="font-size:30px">Nouveau train débloqué</h2><img src="${photo(nt)}" alt="${nt.name}"><p><b>${nt.name}</b></p>`:`<p>Tous les trains sont débloqués !</p>`}<div class="acts" style="justify-content:center"><button class="btn" data-act="again">Un autre voyage</button><button class="btn alt" data-train="${nt?nt.id:P.t.id}">${nt?'Voir '+nt.name:'Voir ce train'}</button></div></div>`;
+  const P=S.play;P.over=true;const nt=reward();
+  $('#msg').textContent=`Arrivée à ${city}.`;unlockPop(nt);
+  $('#end').innerHTML=`<div class="end"><h2>Bravo !</h2><p>Tu as tapé ${P.t.word} et voyagé : ${S.cities.join(' → ')}.</p>${nt?'':`<p>Tous les trains sont débloqués !</p>`}<div class="acts" style="justify-content:center"><button class="btn" data-act="again">Un autre voyage</button><button class="btn alt" data-train="${nt?nt.id:P.t.id}">${nt?'Voir '+nt.name:'Voir ce train'}</button></div></div>`;
 }
 
 /* ---- jeux : chaque train en propose un deuxième ---- */
-const GAMES={tape:{n:'Tape et roule',ic:'kbd'},memo:{n:'Mémo des trains',ic:'memo'},heure:{n:'Quelle heure ?',ic:'clock'},rail:{n:'Aiguillage',ic:'fork'},bon:{n:'Le bon train',ic:'search'},speed:{n:'Plus ou moins',ic:'gauge'}};
-const OTHER=['memo','heure','rail','bon','speed'];
-function otherGame(t){const i=TRAINS.indexOf(t),o=i+Math.floor(i/5);for(let k=0;k<5;k++){const g=OTHER[(o+k)%5];if(g!=='speed'||t.speed)return g}}
-function otherCard(t,lock,k=otherGame(t)){
+const GAMES={tape:{n:'Tape et roule',ic:'kbd'},memo:{n:'Mémo des trains',ic:'memo'},heure:{n:'Quelle heure ?',ic:'clock'},rail:{n:'Aiguillage',ic:'fork'},speed:{n:'Plus ou moins',ic:'gauge'},cap:{n:'Plus ou moins',ic:'seat'}};
+const qtys=t=>[...(t.speed&&!save.solved[t.id+':speed']?['speed']:[]),...(t.cap&&!save.solved[t.id+':cap']?['cap']:[])];
+const lastO={}; // dernier jeu proposé par train : jamais deux fois de suite
+function randOther(t){
+  const p=save.pend[t.id];
+  if(p&&lastO[t.id]!==p&&Math.random()<.5)return lastO[t.id]=p;
+  const opts=['memo','heure','rail'];if(!p&&(t.speed||t.cap))opts.push('pm');
+  const last=lastO[t.id];const i=opts.indexOf(last==='speed'||last==='cap'?'pm':last);if(i>=0)opts.splice(i,1);
+  const k=pick1(opts);lastO[t.id]=k;if(k!=='pm')return k;
+  const q=qtys(t),kind=pick1(q.length?q:[t.speed&&t.cap?pick1(['speed','cap']):t.speed?'speed':'cap']);
+  if(q.length){save.pend[t.id]=kind;persist()}
+  return kind;
+}
+const allOther=t=>['memo','heure','rail',...(t.speed?['speed']:[]),...(t.cap?['cap']:[])];
+function otherCard(t,lock,k=S.other||randOther(t)){
   const g=GAMES[k];
-  const attr=k==='speed'?`data-act="speedone" data-id="${t.id}"`:`data-play="${k}" data-id="${t.id}"`;
+  const attr=`data-play="${k}" data-id="${t.id}"`;
   return `<button class="game alt" ${attr} ${lock?'disabled':''}><svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${IC[g.ic]}</svg><b>${g.n}</b></button>`;
 }
-const gwrap=inner=>`<article class="th" style="${th(byId(S.gt).t)}">${inner}</article>`;
-const gend=msg=>`<div class="end"><h2>Bravo !</h2><p>${msg}</p><div class="acts" style="justify-content:center"><button class="btn" data-act="play-again">Rejouer</button><button class="btn alt" data-train="${S.gt}">Voir le train</button></div></div>`;
+const back=t=>`<a class="back" href="#/train/${t.id}">← ${t.name}</a>`;
+const gwrap=inner=>`<article class="th" style="${th(byId(S.gt).t)}">${back(byId(S.gt))}${inner}</article>`;
+function unlockPop(nt){
+  const o=$('#pop');if(o)o.remove();if(!nt)return;
+  document.body.insertAdjacentHTML('beforeend',`<div id="pop" role="dialog" aria-modal="true" aria-label="Nouveau train débloqué"><div class="popc" style="${th(nt.t)}"><div class="eyebrow">Nouveau train débloqué !</div><img src="${photo(nt)}" alt="${nt.name}"><h2>${nt.name}</h2><div class="acts" style="justify-content:center"><button class="btn" data-train="${nt.id}">Voir ${nt.name}</button><button class="btn alt" data-act="pop-close">Continuer</button></div></div></div>`);
+  const b=$('#pop .btn');if(b)b.focus();
+}
+function reward(){const before=unlockedN();save.trips++;persist();const after=unlockedN();return after>before?TRAINS[after-1]:null}
+const gend=(msg,ok=true,nt=null)=>(unlockPop(nt),`<div class="end"><h2>${ok?'Bravo !':'Presque !'}</h2><p>${msg}</p>${nt?'':`<p>Tous les trains sont débloqués !</p>`}<div class="acts" style="justify-content:center"><button class="btn" data-act="play-again">Rejouer</button><button class="btn alt" data-train="${nt?nt.id:S.gt}">${nt?'Voir '+nt.name:'Voir le train'}</button></div></div>`);
 function startGame(kind,id){
   S.gt=id;S.gk=kind;
-  if(kind==='memo')startMemo();else if(kind==='heure')startHeure();else if(kind==='rail')startRail();else if(kind==='bon')startBon();
+  if(kind==='speed'||kind==='cap'){startSpeed(id,kind);return}
+  if(kind==='memo')startMemo();else if(kind==='heure')startHeure();else if(kind==='rail')startRail();
   S.v=kind;render();
 }
 function animate(ms,fn,done){
@@ -470,7 +525,7 @@ function startMemo(){
 function memo(){
   const g=S.g;
   const cards=g.cards.map(c=>{const t=byId(c.id),up=c.open||c.done;return `<button class="mc ${up?'up':''} ${c.done?'ok':''}" data-card="${c.i}" aria-label="${up?t.name:'Carte cachée'}">${up?`<img src="${photo(t)}" alt="" style="object-position:${t.pos}"><span>${c.done&&unlocked(t)?t.name:''}</span>`:'<b>?</b>'}</button>`}).join('');
-  return gwrap(`<div class="era-tag">Mémo des trains · ${g.moves} ${g.moves>1?'coups':'coup'} · ${g.pairs} sur ${g.total} paires</div><div class="memo">${cards}</div>${g.pairs===g.total?gend(`Tu as trouvé les ${g.total} paires en ${g.moves} coups.`):''}`);
+  return gwrap(`<div class="era-tag">Mémo des trains · ${g.moves} ${g.moves>1?'coups':'coup'} · ${g.pairs} sur ${g.total} paires</div><div class="memo">${cards}</div>${g.pairs===g.total?gend(`Tu as trouvé les ${g.total} paires en ${g.moves} coups.`,true,g.nt):''}`);
 }
 function memoFlip(i){
   const g=S.g,c=g.cards[i];
@@ -478,7 +533,7 @@ function memoFlip(i){
   c.open=true;
   if(g.first===null){g.first=i;render(true);return}
   const a=g.cards[g.first];g.moves++;
-  if(a.id===c.id){a.done=c.done=true;a.open=c.open=false;g.pairs++;g.first=null;render(true)}
+  if(a.id===c.id){a.done=c.done=true;a.open=c.open=false;g.pairs++;g.first=null;if(g.pairs===g.total&&!g.rewarded){g.rewarded=true;g.nt=reward()}render(true)}
   else{g.lock=true;render(true);setTimeout(()=>{a.open=c.open=false;g.first=null;g.lock=false;if(S.v==='memo'&&S.g===g)render(true)},900)}
 }
 
@@ -500,11 +555,11 @@ function clockSVG(h,m){
 }
 function heure(){
   const g=S.g,q=g.q,over=g.phase==='win'||g.phase==='lose';
-  if(g.phase==='end')return gwrap(gend(`Score : ${g.score} sur 5.`));
+  if(g.phase==='end')return gwrap(gend(`Score : ${g.score} sur 5.${g.score>=3?'':' Il faut 3 bonnes réponses pour débloquer le train suivant.'}`,g.score>=3,g.nt));
   return gwrap(`<div class="era-tag">Quelle heure ? · Question ${g.r+1} sur 5 · Score ${g.score}</div><div class="tp"><div class="mapcard" style="display:flex;justify-content:center">${clockSVG(q.h,q.m)}</div><div><h1 style="font-size:clamp(30px,4.4vw,52px)">À quelle heure part ce train ?</h1><div class="opts">${q.opts.map(o=>`<button class="opt ${over&&o===q.good?'good':''} ${over&&o===g.pick&&o!==q.good?'bad':''}" data-ans="${o}" ${over?'disabled':''}>${o}</button>`).join('')}</div><div class="hint" aria-live="polite">${g.phase==='win'?'Bravo !':g.phase==='lose'?`C'était ${q.good}.`:''}</div>${over?`<div class="acts"><button class="btn" data-act="hnext">${g.r===4?'Voir mon score':'Suivant ▸'}</button></div>`:''}</div></div>`);
 }
 function heureAns(v){const g=S.g;if(g.phase!=='ask')return;g.pick=v;if(v===g.q.good){g.phase='win';g.score++}else g.phase='lose';render(true)}
-function heureNext(){const g=S.g;if(g.r>=4)g.phase='end';else{g.r++;g.q=heureQ(g.r);g.phase='ask';g.pick=null}render()}
+function heureNext(){const g=S.g;if(g.r>=4){g.phase='end';if(g.score>=3)g.nt=reward()}else{g.r++;g.q=heureQ(g.r);g.phase='ask';g.pick=null}render()}
 
 /* Aiguillage */
 function startRail(){S.g={lv:0,score:0};railLevel()}
@@ -515,35 +570,36 @@ function railLevel(){
   g.target=pick1(g.names);g.att=0;g.phase='set';g.run=false;g.msg='';
 }
 function railGeo(D){
-  const L=1<<D,x0=50,x1=500,pos={},ly=i=>34+(i+.5)*(292/L);
+  const L=1<<D,x0=150,x1=520,pos={},ly=i=>44+(i+.5)*(312/L);
   for(let d=0;d<=D;d++){const n=1<<d,span=L/n;for(let i=0;i<n;i++)pos[d+'-'+i]=[x0+d*(x1-x0)/D,(ly(i*span)+ly(i*span+span-1))/2]}
   return pos;
 }
 const seg=(a,b)=>`C${(a[0]+b[0])/2},${a[1]} ${(a[0]+b[0])/2},${b[1]} ${b[0]},${b[1]}`;
+const RSTART=70;
 function railRoute(g){
-  const pos=railGeo(g.D);let i=0,d=`M${pos['0-0'][0]-44},${pos['0-0'][1]} L${pos['0-0'].join(',')}`;
+  const pos=railGeo(g.D),r=pos['0-0'];let i=0,d=`M${RSTART},${r[1]} L${r[0]},${r[1]}`;
   for(let k=0;k<g.D;k++){const c=2*i+g.sw[k+'-'+i];d+=' '+seg(pos[k+'-'+i],pos[(k+1)+'-'+c]);i=c}
   return{d,leaf:i};
 }
 function railSVG(g,t){
-  const pos=railGeo(g.D),acc=line(t),rt=railRoute(g);let tr='',sw='',lv='';
+  const pos=railGeo(g.D),acc=line(t),rt=railRoute(g),r0=pos['0-0'];let tr='',sw='',lv='';
+  tr+=`<path d="M${RSTART},${r0[1]} L${r0[0]},${r0[1]}" fill="none" stroke="#2A2420" stroke-width="10"/><path d="M${RSTART},${r0[1]} L${r0[0]},${r0[1]}" fill="none" stroke="#EFE9DA" stroke-width="10" stroke-dasharray="2 11"/>`;
   for(let d=0;d<g.D;d++)for(let i=0;i<1<<d;i++){
     const a=pos[d+'-'+i],open=g.sw[d+'-'+i];
     for(let c=0;c<2;c++){const b=pos[(d+1)+'-'+(2*i+c)],p=`M${a[0]},${a[1]} ${seg(a,b)}`;
-      tr+=c===open?`<path d="${p}" fill="none" stroke="#2A2420" stroke-width="9"/><path d="${p}" fill="none" stroke="#EFE9DA" stroke-width="9" stroke-dasharray="2 10"/>`:`<path d="${p}" fill="none" stroke="#2A2420" stroke-opacity=".28" stroke-width="5"/>`}
+      tr+=c===open?`<path d="${p}" fill="none" stroke="#2A2420" stroke-width="10"/><path d="${p}" fill="none" stroke="#EFE9DA" stroke-width="10" stroke-dasharray="2 11"/>`:`<path d="${p}" fill="none" stroke="#2A2420" stroke-opacity=".25" stroke-width="5"/>`}
     const b=pos[(d+1)+'-'+(2*i+open)],ang=Math.atan2(b[1]-a[1],b[0]-a[0]);
-    sw+=`<g data-sw="${d}-${i}" role="button" tabindex="0" aria-label="Aiguillage : touche pour changer de voie" style="cursor:pointer"><circle cx="${a[0]}" cy="${a[1]}" r="18" fill="${acc}" stroke="#fff" stroke-width="4"/><path d="M${a[0]},${a[1]} l${(11*Math.cos(ang)).toFixed(1)},${(11*Math.sin(ang)).toFixed(1)}" stroke="#fff" stroke-width="5" stroke-linecap="round"/></g>`;
+    sw+=`<g data-sw="${d}-${i}" role="button" tabindex="0" aria-label="Aiguillage : touche pour changer de voie" style="cursor:pointer"><circle cx="${a[0]}" cy="${a[1]}" r="38" fill="transparent"/><circle cx="${a[0]}" cy="${a[1]}" r="25" fill="${acc}" stroke="#fff" stroke-width="5"/><path d="M${a[0]},${a[1]} l${(15*Math.cos(ang)).toFixed(1)},${(15*Math.sin(ang)).toFixed(1)}" stroke="#fff" stroke-width="7" stroke-linecap="round"/></g>`;
   }
-  g.names.forEach((n,i)=>{const p=pos[g.D+'-'+i],tg=n===g.target;lv+=`<circle cx="${p[0]}" cy="${p[1]}" r="${tg?11:7}" fill="${tg?acc:'#9aa0a6'}" stroke="#fff" stroke-width="3"/><text x="${p[0]+18}" y="${p[1]+6}" font-size="19" font-weight="700" fill="#23262B" font-family="Lato,sans-serif">${tg?'★ ':''}${n}</text>`});
-  const s=[pos['0-0'][0]-44,pos['0-0'][1]];
-  return `<svg viewBox="0 0 640 360" role="img" aria-label="Un réseau de voies avec des aiguillages">${tr}<path d="M${s[0]},${s[1]} L${pos['0-0'].join(',')}" fill="none" stroke="#2A2420" stroke-width="9"/><path id="rp" d="${rt.d}" fill="none" stroke="none"/>${lv}${sw}<text x="${s[0]-24}" y="${s[1]-36}" font-size="16" font-weight="700" fill="#23262B" font-family="Lato,sans-serif">Départ</text><g id="rt" transform="translate(${s[0]},${s[1]})"><clipPath id="rc"><circle r="26"/></clipPath><circle r="31" fill="#fff"/><image href="${photo(t)}" x="-38" y="-27" width="76" height="54" preserveAspectRatio="xMidYMid slice" clip-path="url(#rc)"/><circle r="31" fill="none" stroke="${acc}" stroke-width="5"/></g></svg>`;
+  g.names.forEach((n,i)=>{const p=pos[g.D+'-'+i],tg=n===g.target;lv+=`<circle cx="${p[0]}" cy="${p[1]}" r="${tg?13:8}" fill="${tg?acc:'#9aa0a6'}" stroke="#fff" stroke-width="3"/><text x="${p[0]+22}" y="${p[1]+8}" font-size="23" font-weight="700" fill="#23262B" font-family="Lato,sans-serif">${tg?'★ ':''}${n}</text>`});
+  return `<svg viewBox="0 0 700 400" role="img" aria-label="Un réseau de voies avec des aiguillages">${tr}<path id="rp" d="${rt.d}" fill="none" stroke="none"/>${lv}${sw}<text x="${RSTART}" y="${r0[1]-44}" text-anchor="middle" font-size="19" font-weight="700" fill="#23262B" font-family="Lato,sans-serif">Départ</text><g id="rt" transform="translate(${RSTART},${r0[1]})"><clipPath id="rc"><circle r="29"/></clipPath><circle r="34" fill="#fff"/><image href="${photo(t)}" x="-42" y="-30" width="84" height="60" preserveAspectRatio="xMidYMid slice" clip-path="url(#rc)"/><circle r="34" fill="none" stroke="${acc}" stroke-width="5"/></g></svg>`;
 }
 function rail(){
   const g=S.g,t=byId(S.gt);
-  if(g.phase==='end')return gwrap(gend(`Score : ${g.score} sur 9.`));
+  if(g.phase==='end')return gwrap(gend(`Score : ${g.score} sur 9.`,true,g.nt));
   const msg=g.phase==='win'?'Bravo, le train est arrivé !':g.phase==='miss'?`Oups, le train est allé à ${g.names[railRoute(g).leaf]}.`:g.msg||'Touche un rond pour changer de voie.';
   const btn=g.phase==='set'?`<button class="btn" data-act="rail-go" ${g.run?'disabled':''}>Départ ▸</button>`:g.phase==='miss'?`<button class="btn" data-act="rail-retry">Réessayer</button>`:`<button class="btn" data-act="rail-next">${g.lv===2?'Voir mon score':'Niveau suivant ▸'}</button>`;
-  return gwrap(`<div class="era-tag">Aiguillage · Niveau ${g.lv+1} sur 3 · Score ${g.score}</div><div class="setup"><div class="mapcard">${railSVG(g,t)}</div><div><h1 style="font-size:clamp(30px,4.4vw,52px)">Mène le train à ${g.target} !</h1><div class="banner" style="text-align:left;min-height:56px" aria-live="polite">${msg}</div><div class="acts">${btn}</div></div></div>`);
+  return gwrap(`<div class="era-tag">Aiguillage · Niveau ${g.lv+1} sur 3 · Score ${g.score}</div><h1 style="font-size:clamp(30px,4.4vw,52px)">Mène le train à ${g.target} !</h1><div class="banner" style="text-align:left;min-height:34px;margin:6px 0 14px" aria-live="polite">${msg}</div><div class="mapcard">${railSVG(g,t)}</div><div class="acts" style="justify-content:center">${btn}</div>`);
 }
 function railToggle(k){const g=S.g;if(!g||g.run||g.phase!=='set')return;g.sw[k]^=1;render(true)}
 function railGo(){
@@ -555,68 +611,63 @@ function railGo(){
     if(S.v==='rail'&&S.g===g)render(true);
   });
 }
-function railNext(){const g=S.g;if(g.lv>=2)g.phase='end';else{g.lv++;railLevel()}render()}
+function railNext(){const g=S.g;if(g.lv>=2){g.phase='end';g.nt=reward()}else{g.lv++;railLevel()}render()}
 
-/* Le bon train */
-function bonQ(last){
-  const pool=TRAINS.filter(unlocked);let t;
-  do{t=pick1(pool)}while(pool.length>1&&t.id===last);
-  const others=shuffle(TRAINS.filter(x=>x!==t)).slice(0,2);
-  return{t,pos:`${15+Math.random()*70}% ${25+Math.random()*50}%`,opts:shuffle([t,...others])};
+/* ---- adresses : chaque écran a son lien (#/train/duplex, #/jeu/memo/duplex ...) ---- */
+const go=h=>{if(location.hash===h)applyRoute();else location.hash=h};
+function applyRoute(){
+  const [a,b,c]=location.hash.replace(/^#\/?/,'').split('/').filter(Boolean);
+  S.confirm=false;
+  if(a==='epoques')S.v='eras';
+  else if(a==='album')S.v='album';
+  else if(a==='train'&&byId(b)){S.id=b;S.other=randOther(byId(b));S.v='train'}
+  else if(a==='jeu'&&byId(c)){
+    const t=byId(c);
+    if(!unlocked(t)||!['tape','memo','heure','rail','speed','cap'].includes(b)||(b==='speed'&&!t.speed)||(b==='cap'&&!t.cap)){S.id=c;S.other=randOther(t);S.v='train'}
+    else if(b==='tape'){S.pick=c;S.v='journey'}
+    else{startGame(b,c);return}
+  }else S.v='home';
+  render();
 }
-function startBon(){S.g={r:0,score:0,phase:'zoom',pick:null};S.g.q=bonQ(null)}
-function bon(){
-  const g=S.g,q=g.q,over=g.phase==='win'||g.phase==='lose';
-  if(g.phase==='end')return gwrap(gend(`Score : ${g.score} sur 10.`));
-  const zoom=g.phase==='zoom';
-  return gwrap(`<div class="era-tag">Le bon train · Question ${g.r+1} sur 5 · Score ${g.score}</div><div class="tp"><div class="zoomimg" role="img" aria-label="Un détail d'une photo de train" style="background-image:url(${photo(q.t)});background-size:${zoom?'280%':'cover'};background-position:${zoom?q.pos:q.t.pos}"></div><div><h1 style="font-size:clamp(30px,4.4vw,52px)">Quel est ce train ?</h1><div class="opts">${q.opts.map(o=>`<button class="opt ${over&&o===q.t?'good':''} ${over&&g.pick===o.id&&o!==q.t?'bad':''}" data-bon="${o.id}" ${over?'disabled':''}>${o.name}</button>`).join('')}</div><div class="acts">${zoom?`<button class="btn alt" data-act="bon-wide">Voir toute la photo</button>`:''}${over?`<button class="btn" data-act="bon-next">${g.r===4?'Voir mon score':'Suivant ▸'}</button>`:''}</div></div></div>`);
-}
-function bonAns(id){
-  const g=S.g;if(g.phase!=='zoom'&&g.phase!=='wide')return;
-  const ok=id===g.q.t.id;g.pick=id;if(ok)g.score+=g.phase==='zoom'?2:1;g.phase=ok?'win':'lose';render(true);
-}
-function bonNext(){const g=S.g;if(g.r>=4)g.phase='end';else{g.r++;g.q=bonQ(g.q.t.id);g.phase='zoom';g.pick=null}render()}
-
+window.addEventListener('hashchange',applyRoute);
 document.addEventListener('click',e=>{
   const sw=e.target.closest('[data-sw]');if(sw){railToggle(sw.dataset.sw);return}
   const b=e.target.closest('button');if(!b||b.disabled)return;
+  if(b.closest('#pop')){$('#pop').remove();if(b.dataset.act==='pop-close')return}
   const d=b.dataset;
   if(d.ch){const i=$('#typer');if(i)i.focus();typeChar(d.ch);return}
+  if(d.yt){ytPlay(b,d.yt);return}
   if(d.card!==undefined){memoFlip(+d.card);return}
   if(d.ans){heureAns(d.ans);return}
-  if(d.bon){bonAns(d.bon);return}
-  if(d.play){startGame(d.play,d.id);return}
+  if(d.play){go('#/jeu/'+d.play+'/'+d.id);return}
   if(d.step){setGv(S.sg.gv+Number(d.step));return}
-  if(d.go){if(d.go==='speed')S.sg=null;S.v=d.go;render()}
-  else if(d.train){S.id=d.train;S.v='train';render()}
-  else if(d.pick){S.pick=d.pick;S.v='journey';render()}
+  if(d.go){go(d.go==='home'?'#/':'#/'+(d.go==='eras'?'epoques':d.go))}
+  else if(d.train){go('#/train/'+d.train)}
+  else if(d.pick){go('#/jeu/tape/'+d.pick)}
   else if(d.chose){S.pick=d.chose;render()}
   else if(d.city){const c=S.cities,i=c.indexOf(d.city);if(i>=0)c.splice(i,1);else if(c.length<3)c.push(d.city);render(true)}
   
   else if(d.act==='cred'){const p=b.nextElementSibling;p.hidden=!p.hidden;b.setAttribute('aria-expanded',String(!p.hidden))}
   else if(d.act==='again'){S.cities=[];render()}
-  else if(d.act==='debug-off'){debug=false;try{localStorage.removeItem('carnet-debug')}catch(e){}if(/debug/.test(location.search+location.hash))history.replaceState(null,'',location.pathname);render()}
+  else if(d.act==='debug-off'){location.href=location.pathname+location.hash}
   else if(d.act==='hnext')heureNext();
   else if(d.act==='rail-go')railGo();
   else if(d.act==='rail-retry'){S.g.phase='set';render(true)}
   else if(d.act==='rail-next')railNext();
-  else if(d.act==='bon-wide'){S.g.phase='wide';render(true)}
-  else if(d.act==='bon-next')bonNext();
   else if(d.act==='play-again')startGame(S.gk,S.gt);
   else if(d.act==='speedstart')startSpeed();
-  else if(d.act==='speedone')startSpeed(d.id);
   else if(d.act==='guess')guess();
   else if(d.act==='next')nextSpeed();
   else if(d.act==='reset'){S.confirm=true;render(true)}
   else if(d.act==='reset-no'){S.confirm=false;render(true)}
-  else if(d.act==='reset-yes'){save={seen:[],trips:0};persist();S.confirm=false;S.v='album';render()}
+  else if(d.act==='reset-yes'){save={seen:[],trips:0,pend:{},solved:{}};persist();S.confirm=false;S.v='album';render()}
 });
 document.addEventListener('keydown',e=>{
   if((e.key==='Enter'||e.key===' ')&&e.target.dataset&&e.target.dataset.sw){e.preventDefault();railToggle(e.target.dataset.sw);return}
   if(S.v!=='journey'||!S.play||e.ctrlKey||e.metaKey||e.altKey||e.key.length!==1)return;
   const i=$('#typer');if(document.activeElement!==i){e.preventDefault();i.focus();typeChar(e.key.toUpperCase())}
 });
-render();
+applyRoute();
 </script>
 </body>
 </html>
