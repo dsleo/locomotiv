@@ -56,8 +56,10 @@ h1,h2,h3{margin:0;text-wrap:balance;font-weight:400}
 .mini.lock img{filter:grayscale(1) contrast(.8);opacity:.5}
 /* Pages themed per train */
 .th{background:var(--t-bg);color:var(--t-ink);font-family:var(--t-font);border-radius:0 0 var(--t-r) var(--t-r);padding:28px clamp(16px,3vw,40px) 36px}
-.th .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:52px;padding:0 26px;border:0;border-radius:var(--t-btn);background:var(--t-acc);color:var(--t-on);font-family:var(--t-font);font-size:20px;text-decoration:none;box-shadow:var(--t-sh)}
+.th .btn,.popc .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:52px;padding:0 26px;border:0;border-radius:var(--t-btn);background:var(--t-acc);color:var(--t-on);font-family:var(--t-font);font-size:20px;text-decoration:none;box-shadow:var(--t-sh)}
 .th .btn.alt{background:var(--t-panel);color:var(--t-pi)}
+.popc .btn{background:var(--t-pi);color:var(--t-panel)}
+.popc .btn.alt{background:none;color:var(--t-pi);box-shadow:inset 0 0 0 2px var(--t-pi)}
 .th .btn[disabled]{opacity:.5;cursor:not-allowed}
 .tp{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:36px;align-items:start}
 .frame{margin:0;border:10px solid var(--t-panel);border-radius:var(--t-r);overflow:hidden;box-shadow:var(--t-sh);background:#ccc;line-height:0}
@@ -152,7 +154,7 @@ h1,h2,h3{margin:0;text-wrap:balance;font-weight:400}
 @keyframes ride{from{left:-660px}to{left:100%}}
 @keyframes bob{from{margin-bottom:0}to{margin-bottom:1px}}
 #pop{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(20,20,24,.6)}
-.popc{background:var(--t-panel);color:var(--t-pi);border-radius:var(--t-r);box-shadow:var(--t-sh);padding:22px;max-width:420px;width:100%;max-height:100%;overflow:auto;text-align:center;animation:popin .35s ease-out}
+.popc{font-family:var(--t-font);background:var(--t-panel);color:var(--t-pi);border-radius:var(--t-r);box-shadow:var(--t-sh);padding:22px;max-width:420px;width:100%;max-height:100%;overflow:auto;text-align:center;animation:popin .35s ease-out}
 .popc img{width:100%;display:block;margin:12px 0;border-radius:var(--t-r)}
 .popc h2{font-size:34px;line-height:1;margin-bottom:14px}
 @keyframes popin{from{transform:scale(.85);opacity:0}}
@@ -345,7 +347,7 @@ function album(){
   const n=unlockedN(),total=TRAINS.length,next=TRAINS[n];
   const cards=TRAINS.map((t,i)=>{const on=i<n;return `<button class="stk2 ${on?'on':'off'}" data-train="${t.id}" aria-label="${on?t.name:'Train verrouillé'}"><img src="${photo(t)}" alt="" style="object-position:${t.pos}"><span>${on?t.name:'Verrouillé'}</span>${on?'':`<svg class="lk" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>`}</button>`}).join('');
   const reset=S.confirm?`<div class="rst"><p>Tout effacer et repartir du premier train ?</p><div class="acts"><button class="rbtn" data-act="reset-yes">Oui, recommencer</button><button class="rbtn alt" data-act="reset-no">Non, garder</button></div></div>`:`<button class="rbtn alt" data-act="reset">Recommencer le jeu</button>`;
-  return `<section class="album" aria-label="Mon album" style="margin-top:24px"><div class="albumhead"><div><h1 style="font-family:var(--display);font-size:clamp(36px,6vw,60px);line-height:1;color:var(--red)">Mon album</h1><div class="count"><b>${n}</b> / ${total}</div><div class="small">trains débloqués</div></div><div class="small" style="max-width:30ch;font-size:15px">${next?'Réussis « Tape et roule » pour débloquer le train suivant.':'Bravo, tous les trains sont débloqués !'}</div>${next?`<img class="lp" src="${photo(next)}" alt="Le prochain train">`:''}</div><div class="stks2">${cards}</div>${reset}</section>`;
+  return `<section class="album" aria-label="Mon album" style="margin-top:24px"><div class="albumhead"><div><h1 style="font-family:var(--display);font-size:clamp(36px,6vw,60px);line-height:1;color:var(--red)">Mon album</h1><div class="count"><b>${n}</b> / ${total}</div></div><div class="small" style="max-width:30ch;font-size:15px">${next?'':'Bravo, tous les trains sont débloqués !'}</div>${next?`<img class="lp" src="${photo(next)}" alt="Le prochain train">`:''}</div><div class="stks2">${cards}</div>${reset}</section>`;
 }
 function eras(){
   return `<div style="padding-block:24px 4px"><div class="eyebrow">Explorer par époque</div><h1 style="font-family:var(--display);font-size:clamp(36px,6vw,60px);line-height:1;color:var(--red)">De 1950 à aujourd'hui</h1></div>`+ERAS.map(([n,name,yrs,c])=>`<section class="era" aria-label="${name}"><div><div class="yrs">${yrs}</div><h2>${name}</h2><div style="height:10px;width:120px;background:${c};margin-top:12px"></div></div><div class="row">${TRAINS.filter(t=>t.era===n).map(mini).join('')}</div></section>`).join('');
@@ -355,7 +357,7 @@ function trainPage(){
   const era=ERAS.find(e=>e[0]===t.era);
   if(!lock&&!save.seen.includes(t.id)){save.seen.push(t.id);persist()}
   return `<article class="th" style="${th(t.t)}"><div class="era-tag">${era[1]} · ${t.yrs}</div><div class="tp"><div><div class="phw"><figure class="frame"><img src="${photo(t)}" alt="${t.name}" style="object-position:${t.pos};${lock?'filter:grayscale(1) blur(6px)':''}"></figure>${credBtn(t)}</div>${t.video&&!lock?`<div class="phw vid"><video controls playsinline preload="metadata" poster="${photo(t)}" src="videos/${t.video.f}.mp4" aria-label="Vidéo : ${t.name}"></video>${credBtn(t.video,'Vidéo')}</div>`:''}${YT[t.id]&&!lock?`<div class="yts">${YT[t.id].map(([id,ti])=>`<div class="yt">${ytBtn(id,ti)}</div>`).join('')}</div>`:''}</div>
-  <div><h1>${t.name}</h1><div class="sub">${t.sub}</div>${lock?`<div class="stats"><div class="stat" style="grid-column:1/-1"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><b>Verrouillé</b><span>Réussis « Tape et roule » avec le train d'avant pour débloquer celui-ci.</span></div></div>`:`<div class="stats">${t.stats.map((s,i)=>{const gi=t.stats.findIndex(x=>icoKey(x[0],x[1])==='gauge'),hide=(save.pend[t.id]==='speed'&&i===gi)||(save.pend[t.id]==='cap'&&i===t.ci);return `<div class="stat">${ico(s[0],s[1])}<b>${hide?'?':s[0]}</b><span>${s[1]}</span></div>`}).join('')}</div><p class="blurb">${t.blurb}</p>`}
+  <div><h1>${t.name}</h1><div class="sub">${t.sub}</div>${lock?`<div class="stats"><div class="stat" style="grid-column:1/-1"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><b>Verrouillé</b></div></div>`:`<div class="stats">${t.stats.map((s,i)=>{const gi=t.stats.findIndex(x=>icoKey(x[0],x[1])==='gauge'),hide=(save.pend[t.id]==='speed'&&i===gi)||(save.pend[t.id]==='cap'&&i===t.ci);return `<div class="stat">${ico(s[0],s[1])}<b>${hide?'?':s[0]}</b><span>${s[1]}</span></div>`}).join('')}</div><p class="blurb">${t.blurb}</p>`}
   <div class="games" style="margin-top:22px"><button class="game" data-pick="${t.id}" ${lock?'disabled':''}><svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${IC.kbd}</svg><b>Tape et roule</b></button>${debug?allOther(t).map(k=>otherCard(t,lock,k)).join(''):otherCard(t,lock)}</div></div></div></div>
   </article>`;
 }
