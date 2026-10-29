@@ -325,9 +325,11 @@ function route(a,b){
 }
 const pathD=names=>names.map((n,i)=>(i?'L':'M')+CITY[n].join(',')).join(' ');
 
+// étiquettes des villes choisies qui ne se placent pas à droite du point : [dx, dy, ancrage]
+const LAB={Paris:[40,-22,'start'],Marseille:[0,56,'middle'],Strasbourg:[0,56,'middle']};
 function mapSVG(opts){
   const {sel=[],legs=[],acc='#C8282D',land='#fff',ink='#222',stroke='#999'}=opts;
-  const dots=Object.keys(CITY).map(n=>{const [x,y]=CITY[n],on=sel.includes(n);return `<circle cx="${x}" cy="${y}" r="${on?13:6}" fill="${on?acc:stroke}" stroke="${land}" stroke-width="4"/><text x="${x+(on?18:11)}" y="${y+(on?-12:5)}" font-size="${on?22:14}" font-weight="700" fill="${ink}" stroke="${land}" stroke-width="5" paint-order="stroke" font-family="Lato,sans-serif">${n}</text>`}).join('');
+  const dots=Object.keys(CITY).map(n=>{const [x,y]=CITY[n],on=sel.includes(n);return `<circle cx="${x}" cy="${y}" r="${on?13:6}" fill="${on?acc:stroke}" stroke="${land}" stroke-width="4"/><text x="${x+(on?LAB[n]?.[0]??18:11)}" y="${y+(on?LAB[n]?.[1]??-12:5)}" ${on&&LAB[n]?'text-anchor="'+LAB[n][2]+'" ':''}font-size="${on?22:14}" font-weight="700" fill="${ink}" stroke="${land}" stroke-width="5" paint-order="stroke" font-family="Lato,sans-serif">${n}</text>`}).join('');
   const lines=legs.map(l=>`<path d="${pathD(l)}" fill="none" stroke="${acc}" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>`).join('');
   return `<svg viewBox="0 0 600 579" id="map" role="img" aria-label="Carte de la France avec des lignes de chemin de fer"><path d="${LAND}" fill="${land}" stroke="${stroke}" stroke-width="2" stroke-linejoin="round"/><g fill="none" stroke="${stroke}" stroke-width="2" stroke-dasharray="2 6">${EDGES.map(([a,b])=>`<path d="${pathD([a,b])}"/>`).join('')}</g><g id="done">${lines}</g><g id="live"></g>${dots}</svg>`;
 }
