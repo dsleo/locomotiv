@@ -29,6 +29,12 @@ Licences : [CC0](https://creativecommons.org/publicdomain/zero/1.0/deed.fr) · [
 | `photos/ouigo.jpg` | OUIGO | Hoff1980 | CC BY-SA 3.0 | [Ouigo TGV Duplex 762 Marseille.JPG](https://commons.wikimedia.org/wiki/File:Ouigo_TGV_Duplex_762_Marseille.JPG) |
 | `photos/inoui.jpg` | TGV inOui | A.lloyd999ify | CC BY-SA 4.0 | [TGV Atlantique 343 Carmillon.jpg](https://commons.wikimedia.org/wiki/File:TGV_Atlantique_343_Carmillon.jpg) |
 | `photos/jaune.jpg` | Le Train Jaune | Mike McBey | CC BY 2.0 | [Train Jaune - The Little Yellow Train (40295463731).jpg](https://commons.wikimedia.org/wiki/File:Train_Jaune_-_The_Little_Yellow_Train_(40295463731).jpg) |
+| `photos/lunea.jpg` | Lunéa | Florian Pépellin | CC BY-SA 4.0 | [Train de nuit Lunéa quittant Argelès-sur-Mer au matin (été 2008).JPG](https://commons.wikimedia.org/wiki/File:Train_de_nuit_Lun%C3%A9a_quittant_Argel%C3%A8s-sur-Mer_au_matin_(%C3%A9t%C3%A9_2008).JPG) |
+| `photos/icn.jpg` | Intercités de nuit | Skola19 | CC BY-SA 4.0 | [Rame Intercités de nuit en gare de Latour-de-Carol - Enveitg.jpg](https://commons.wikimedia.org/wiki/File:Rame_Intercit%C3%A9s_de_nuit_en_gare_de_Latour-de-Carol_-_Enveitg.jpg) |
+| `photos/thalys.jpg` | Thalys | Rob Dammers | CC BY 2.0 | [Köln Hbf Thalys PBKA 4331 (50127171171).jpg](https://commons.wikimedia.org/wiki/File:K%C3%B6ln_Hbf_Thalys_PBKA_4331_(50127171171).jpg) |
+| `photos/eurostar.jpg` | Eurostar | Francisco Welter-Schultes | CC0 | [373007-eurostar-3007-paris-nord-23-10-2012-fws.jpg](https://commons.wikimedia.org/wiki/File:373007-eurostar-3007-paris-nord-23-10-2012-fws.jpg) |
+| `photos/lyria.jpg` | TGV Lyria | Remontees | CC BY-SA 4.0 | [TGV-2N2-Lyria-Genève.jpg](https://commons.wikimedia.org/wiki/File:TGV-2N2-Lyria-Gen%C3%A8ve.jpg) |
+| `photos/trenitalia.jpg` | Trenitalia Frecciarossa | Florian Pépellin | CC BY-SA 4.0 | [TGV Frecciarossa Milan-Paris à Modane (avril 2022).JPG](https://commons.wikimedia.org/wiki/File:TGV_Frecciarossa_Milan-Paris_%C3%A0_Modane_(avril_2022).JPG) |
 
 ## Vidéos
 
