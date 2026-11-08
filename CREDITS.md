@@ -4,7 +4,7 @@ Toutes les photos et vidéos viennent de [Wikimedia Commons](https://commons.wik
 
 Modifications faites ici : les photos sont réduites à 1 000 px de large et recompressées ; les vidéos sont coupées à 25 secondes, sans le son, en 480 p.
 
-Licences : [CC0](https://creativecommons.org/publicdomain/zero/1.0/deed.fr) · [CC BY 2.0](https://creativecommons.org/licenses/by/2.0/deed.fr) · [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/deed.fr) · [CC BY-SA 2.0](https://creativecommons.org/licenses/by-sa/2.0/deed.fr) · [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/deed.fr) · [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/deed.fr)
+Licences : [CC0](https://creativecommons.org/publicdomain/zero/1.0/deed.fr) · [CC BY 2.0](https://creativecommons.org/licenses/by/2.0/deed.fr) · [CC BY 2.5](https://creativecommons.org/licenses/by/2.5/deed.fr) · [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/deed.fr) · [CC BY-SA 2.0](https://creativecommons.org/licenses/by-sa/2.0/deed.fr) · [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/deed.fr) · [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/deed.fr)
 
 ## Photos
 
@@ -34,6 +34,9 @@ Licences : [CC0](https://creativecommons.org/publicdomain/zero/1.0/deed.fr) · [
 | `photos/thalys.jpg` | Thalys | Rob Dammers | CC BY 2.0 | [Köln Hbf Thalys PBKA 4331 (50127171171).jpg](https://commons.wikimedia.org/wiki/File:K%C3%B6ln_Hbf_Thalys_PBKA_4331_(50127171171).jpg) |
 | `photos/eurostar.jpg` | Eurostar | Francisco Welter-Schultes | CC0 | [373007-eurostar-3007-paris-nord-23-10-2012-fws.jpg](https://commons.wikimedia.org/wiki/File:373007-eurostar-3007-paris-nord-23-10-2012-fws.jpg) |
 | `photos/lyria.jpg` | TGV Lyria | Remontees | CC BY-SA 4.0 | [TGV-2N2-Lyria-Genève.jpg](https://commons.wikimedia.org/wiki/File:TGV-2N2-Lyria-Gen%C3%A8ve.jpg) |
+| `photos/pacific.jpg` | Pacific 231 G 558 | Crochet.david | CC BY-SA 3.0 | [Pacific 231G 558-07juin2009-49.jpg](https://commons.wikimedia.org/wiki/File:Pacific_231G_558-07juin2009-49.jpg) |
+| `photos/mikado.jpg` | Mikado 141 R 568 | Didier Duforest | CC BY 2.5 | [141-R-568-a.jpg](https://commons.wikimedia.org/wiki/File:141-R-568-a.jpg) |
+| `photos/mountain.jpg` | Mountain 241 P 17 | Didier Duforest | CC BY-SA 4.0 | [241-P-17-Paris-Est-a.jpg](https://commons.wikimedia.org/wiki/File:241-P-17-Paris-Est-a.jpg) |
 | `photos/trenitalia.jpg` | Trenitalia Frecciarossa | Florian Pépellin | CC BY-SA 4.0 | [TGV Frecciarossa Milan-Paris à Modane (avril 2022).JPG](https://commons.wikimedia.org/wiki/File:TGV_Frecciarossa_Milan-Paris_%C3%A0_Modane_(avril_2022).JPG) |
 
 ## Vidéos

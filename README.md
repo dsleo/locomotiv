@@ -2,7 +2,7 @@
 
 Un petit jeu pour découvrir les trains de France, de 1950 à aujourd'hui. Pour les enfants de 5 à 10 ans, à faire seul ou avec un parent.
 
-- **Explorer** : 25 vrais trains rangés par époque (dont des trains de nuit à couchettes et des trains internationaux : Thalys, Eurostar, Lyria, Trenitalia). Chaque train a sa fiche, son style (couleurs, lettres, formes) et sa photo ; certains ont une vidéo.
+- **Explorer** : 28 vrais trains rangés par époque (dont des trains de nuit à couchettes, des trains internationaux : Thalys, Eurostar, Lyria, Trenitalia, et des locomotives à vapeur : Pacific 231 G, Mikado 141 R, Mountain 241 P). Chaque train a sa fiche, son style (couleurs, lettres, formes) et sa photo ; certains ont une vidéo.
 - **Jeux** : *Tape et roule* (taper le nom du train pour la première étape, puis le nom de la ville d'arrivée pour les suivantes, sur la carte) et, au hasard, un deuxième jeu parmi *Mémo des trains* (trois niveaux : grilles 3×3, 4×4 puis 5×5, avec une case libre au centre quand le nombre de cases est impair), *Quelle heure ?*, *Aiguillage* et *Plus ou moins* (deviner la vitesse ou le nombre de places d'un train). Réussir l'un des deux débloque le train suivant.
 - **Progression** : un seul train est ouvert au début. Sur la fiche d'un train, la vitesse ou le nombre de places reste caché (« ? ») tant que *Plus ou moins* n'est pas réussi. Le bouton « Recommencer le jeu » est dans *Mon album*. La progression est gardée dans le navigateur (`localStorage`).
 - **Vidéos** : quelques clips libres (dans `videos/`) et des vidéos YouTube, chargées seulement quand on clique dessus.
